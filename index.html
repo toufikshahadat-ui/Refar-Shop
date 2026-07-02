@@ -11,13 +11,16 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
     
     <style>
+        /* 2026 Premium Dark-Blue Theme & Larger Fonts */
         :root {
-            --primary-color: #007bff;
-            --secondary-color: #0056b3;
-            --bg-color: #f4f7f6;
-            --card-bg: #ffffff;
-            --text-color: #333333;
-            --text-muted: #777777;
+            --primary-gradient: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+            --accent-color: #00d2ff;
+            --accent-hover: #00a8cc;
+            --card-bg: rgba(255, 255, 255, 0.08);
+            --bg-color: #0a0f1d;
+            --text-color: #ffffff;
+            --text-muted: #b0bec5;
+            --success-color: #00e676;
         }
 
         * {
@@ -31,308 +34,368 @@
         body {
             background-color: var(--bg-color);
             color: var(--text-color);
-            padding-bottom: 80px;
+            padding-bottom: 90px;
             overflow-x: hidden;
+            font-size: 16px; /* Increased Base Font */
         }
 
-        /* Top Header */
-        .header {
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            color: white;
-            padding: 20px 15px;
+        /* 1. Professional Loading Animation Screen */
+        #loading-screen {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: #060913;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.6s ease-out;
+        }
+
+        .loader-logo {
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid var(--accent-color);
+            box-shadow: 0 0 25px var(--accent-color);
+            animation: pulse Glow 2s infinite alternate;
+        }
+
+        @keyframes pulseGlow {
+            0% { transform: scale(1); box-shadow: 0 0 20px var(--accent-color); }
+            100% { transform: scale(1.05); box-shadow: 0 0 40px #00e676; }
+        }
+
+        .loader-spinner {
+            margin-top: 25px;
+            width: 45px;
+            height: 45px;
+            border: 4px solid rgba(255,255,255,0.1);
+            border-left-color: var(--accent-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        .loader-text {
+            margin-top: 15px;
+            font-size: 18px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            color: var(--accent-color);
+        }
+
+        /* 2. Mandatory Join Popup */
+        #join-popup {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(8px);
+            z-index: 9998;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            opacity: 0; pointer-events: none;
+            transition: 0.4s ease;
+        }
+
+        #join-popup.show { opacity: 1; pointer-events: auto; }
+
+        .popup-content {
+            background: #111827;
+            border: 2px solid var(--accent-color);
+            border-radius: 20px;
+            padding: 30px 20px;
+            width: 100%;
+            max-width: 360px;
             text-align: center;
-            border-bottom-left-radius: 20px;
-            border-bottom-right-radius: 20px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            transform: translateY(30px);
+            transition: 0.4s ease;
+        }
+
+        #join-popup.show .popup-content { transform: translateY(0); }
+
+        .popup-title {
+            font-size: 22px;
+            font-weight: bold;
+            color: var(--accent-color);
+            margin-bottom: 10px;
+        }
+
+        .popup-text {
+            font-size: 15px;
+            color: var(--text-muted);
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .popup-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            padding: 14px;
+            margin-bottom: 12px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 16px;
+            color: white;
+            transition: 0.3s;
+        }
+
+        .btn-chan1 { background: linear-gradient(135deg, #0088cc, #006699); }
+        .btn-chan2 { background: linear-gradient(135deg, #8a3ab9, #bc2a8d); }
+        
+        .popup-verify {
+            background: var(--success-color);
+            color: #000;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+            padding: 14px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        /* Top Header Area */
+        .header {
+            background: var(--primary-gradient);
+            padding: 25px 20px;
+            text-align: center;
+            border-bottom-left-radius: 25px;
+            border-bottom-right-radius: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .header h2 {
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
         }
 
         .user-profile {
             display: flex;
             align-items: center;
-            gap: 12px;
-            margin-top: 10px;
-            background: rgba(255, 255, 255, 0.15);
-            padding: 10px 15px;
+            gap: 15px;
+            margin-top: 15px;
+            background: rgba(255, 255, 255, 0.06);
+            backdrop-filter: blur(5px);
+            padding: 12px 18px;
             border-radius: 50px;
+            border: 1px solid rgba(255,255,255,0.1);
         }
 
         .user-avatar {
-            width: 40px;
-            height: 40px;
-            background: white;
-            color: var(--primary-color);
+            width: 48px;
+            height: 48px;
+            background: var(--accent-color);
+            color: #000;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: bold;
-            font-size: 18px;
+            font-size: 22px;
         }
 
-        .user-info {
-            text-align: left;
-            flex-grow: 1;
-        }
+        .user-info { text-align: left; flex-grow: 1; }
+        .user-info .name { font-size: 16px; font-weight: bold; }
+        .user-info .id { font-size: 12px; color: var(--text-muted); }
 
         .user-balance {
-            background: #ffffff;
-            color: var(--primary-color);
-            padding: 5px 12px;
+            background: var(--success-color);
+            color: #000;
+            padding: 6px 15px;
             border-radius: 20px;
-            font-weight: bold;
-            font-size: 14px;
+            font-weight: 800;
+            font-size: 16px;
         }
 
-        /* Container and Pages */
-        .container {
-            padding: 15px;
-        }
+        /* Main Container & Modern Cards */
+        .container { padding: 20px 15px; }
+        
+        .page { display: none; animation: fadeIn 0.4s ease-in-out; }
+        .page.active { display: block; }
 
-        .page {
-            display: none;
-        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        .page.active {
-            display: block;
-        }
-
-        /* Cards and UI Elements */
         .card {
             background: var(--card-bg);
-            border-radius: 12px;
-            padding: 15px;
-            margin-bottom: 15px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
         }
 
         .card-title {
-            font-size: 16px;
-            font-weight: 600;
-            color: var(--secondary-color);
-            margin-bottom: 12px;
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--accent-color);
+            margin-bottom: 15px;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
         }
 
-        /* Form Inputs */
-        .form-group {
-            margin-bottom: 15px;
-        }
-
+        /* Standard Forms Larger Controls */
+        .form-group { margin-bottom: 18px; }
         .form-group label {
             display: block;
-            font-size: 13px;
+            font-size: 14px;
             color: var(--text-muted);
-            margin-bottom: 5px;
+            margin-bottom: 8px;
             font-weight: 500;
         }
 
         .form-control {
             width: 100%;
-            padding: 12px;
-            border: 1px solid #dddddd;
-            border-radius: 8px;
+            padding: 14px;
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 10px;
             outline: none;
-            font-size: 14px;
-            background-color: #fafafa;
+            font-size: 15px;
+            background-color: rgba(0,0,0,0.2);
+            color: white;
             transition: 0.3s;
         }
 
         .form-control:focus {
-            border-color: var(--primary-color);
-            background-color: #ffffff;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 10px rgba(0, 210, 255, 0.2);
         }
 
-        /* Buttons */
+        /* Buttons Elite Styles */
         .btn {
             display: block;
             width: 100%;
-            padding: 12px;
-            background-color: var(--primary-color);
-            color: white;
+            padding: 14px;
+            background: linear-gradient(135deg, var(--accent-color), #0099ff);
+            color: #000;
             border: none;
-            border-radius: 8px;
-            font-size: 15px;
-            font-weight: 600;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 700;
             text-align: center;
             cursor: pointer;
-            transition: 0.3s;
+            transition: 0.2s ease;
         }
 
-        .btn:active {
-            background-color: var(--secondary-color);
-            transform: scale(0.98);
-        }
-
-        .btn-success { background-color: #28a745; }
+        .btn:active { transform: scale(0.97); opacity: 0.9; }
+        .btn-success { background: linear-gradient(135deg, #00e676, #00b0ff); color: black; }
         
         .btn-copy {
-            background-color: #e9ecef;
-            color: #495057;
-            padding: 8px 15px;
-            font-size: 13px;
-            border-radius: 6px;
-            display: inline-block;
-            width: auto;
-            margin-top: 5px;
-            border: none;
-            cursor: pointer;
-            font-weight: 500;
-        }
-
-        /* Micro Tasks List */
-        .task-item {
-            border-left: 4px solid var(--primary-color);
-            background: #fdfdfd;
-            padding: 12px;
-            border-radius: 6px;
-            margin-bottom: 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
-        }
-
-        .task-details h4 {
+            background: rgba(255,255,255,0.1);
+            color: var(--accent-color);
+            padding: 10px 18px;
             font-size: 14px;
-            margin-bottom: 3px;
-        }
-        .task-details p {
-            font-size: 12px;
-            color: var(--text-muted);
-        }
-
-        .task-action .btn-sm {
-            padding: 6px 12px;
-            font-size: 12px;
-            border-radius: 6px;
-            width: auto;
-            display: inline-block;
-        }
-
-        /* Copy Notice and Tips */
-        .notice-box {
-            background-color: #e8f4fd;
-            border-left: 4px solid var(--primary-color);
-            padding: 10px;
-            font-size: 12px;
-            color: #1d6fa5;
-            border-radius: 4px;
+            border-radius: 8px;
+            border: 1px solid rgba(0, 210, 255, 0.3);
+            cursor: pointer;
+            font-weight: 600;
             margin-top: 10px;
         }
 
-        /* Developer Box Section */
-        .developer-box {
-            background: linear-gradient(135deg, #ffffff, #eef5fc);
-            border: 1px solid #bce0fd;
-            border-radius: 12px;
+        /* Task Module Setup */
+        .task-item {
+            background: rgba(255, 255, 255, 0.04);
+            border-left: 5px solid var(--accent-color);
             padding: 15px;
-            margin-top: 20px;
-            margin-bottom: 15px;
-            text-align: center;
-            box-shadow: 0 4px 12px rgba(0,123,255,0.05);
-            text-decoration: none;
-            display: block;
-            color: inherit;
-            transition: 0.3s;
-        }
-        
-        .developer-box:active {
-            transform: scale(0.98);
-            background: linear-gradient(135deg, #eef5fc, #ffffff);
-        }
-
-        .dev-title {
-            font-size: 12px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: var(--text-muted);
-            margin-bottom: 4px;
-            font-weight: bold;
-        }
-
-        .dev-name {
-            font-size: 16px;
-            font-weight: bold;
-            color: #333;
-            margin-bottom: 2px;
-        }
-
-        .dev-id {
-            font-size: 13px;
-            color: var(--primary-color);
-            font-weight: 600;
-            margin-bottom: 8px;
-        }
-
-        .dev-text {
-            font-size: 12px;
-            color: #555;
-            background: #ffffff;
-            padding: 6px 10px;
-            border-radius: 20px;
-            display: inline-block;
-            border: 1px dashed var(--primary-color);
-        }
-
-        /* Bottom Nav Bar */
-        .navbar {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 60px;
-            background-color: white;
+            border-radius: 10px;
+            margin-bottom: 12px;
             display: flex;
-            justify-content: space-around;
+            justify-content: space-between;
             align-items: center;
-            box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+        }
+
+        .task-details h4 { font-size: 16px; margin-bottom: 4px; color: #fff; }
+        .task-details p { font-size: 13px; color: var(--text-muted); }
+
+        .task-action .btn-sm {
+            padding: 8px 14px;
+            font-size: 13px;
+            font-weight: 700;
+            border-radius: 6px;
+            background: var(--success-color);
+            color: #000;
+            border: none;
+        }
+
+        /* Mega Admin Dashboard Integration */
+        .admin-badge { background: #ff1744; color: white; padding: 3px 8px; border-radius: 8px; font-size: 11px; margin-left: 6px; }
+        .admin-section-title { font-size: 16px; font-weight: bold; color: #ff1744; margin: 15px 0 10px 0; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 5px; }
+        
+        .user-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+        .user-table th, .user-table td {
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 10px;
+            text-align: left;
+        }
+        .user-table th { background: rgba(255,255,255,0.05); color: var(--accent-color); }
+
+        /* Navigation Bar Styles */
+        .navbar {
+            position: fixed; bottom: 0; left: 0; right: 0; height: 68px;
+            background-color: #0b132b;
+            border-top: 1px solid rgba(255,255,255,0.08);
+            display: flex; justify-content: space-around; align-items: center;
             z-index: 1000;
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.4);
         }
 
         .nav-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            color: var(--text-muted);
-            font-size: 11px;
-            text-decoration: none;
-            cursor: pointer;
-            transition: 0.2s;
+            display: flex; flex-direction: column; align-items: center;
+            color: var(--text-muted); font-size: 13px; text-decoration: none; cursor: pointer; transition: 0.2s;
         }
 
-        .nav-item i {
-            font-size: 20px;
-            margin-bottom: 2px;
-        }
-
-        .nav-item.active {
-            color: var(--primary-color);
-            font-weight: bold;
-        }
-
-        /* Admin Section Styling */
-        .admin-badge {
-            background: #dc3545;
-            color: white;
-            padding: 2px 8px;
-            border-radius: 10px;
-            font-size: 10px;
-            margin-left: 5px;
-        }
+        .nav-item i { font-size: 22px; margin-bottom: 4px; }
+        .nav-item.active { color: var(--accent-color); font-weight: 700; }
     </style>
 </head>
 <body>
 
-    <!-- Header Section -->
+    <!-- 1. Custom Professional Room Style Loading Screen -->
+    <div id="loading-screen">
+        <img src="https://i.postimg.cc/gkm3ZNVT/IMG-20260702-235054-440.jpg" alt="Refar Shop Logo" class="loader-logo"/>
+        <div class="loader-spinner"></div>
+        <div class="loader-text">REFAR SHOP LOADING...</div>
+    </div>
+
+    <!-- 2. Dual Channel Mandatory Join Popup -->
+    <div id="join-popup">
+        <div class="popup-content">
+            <div class="popup-title"><i class="fa-solid fa-shield-halved"></i> চ্যানেল জয়েন করুন</div>
+            <div class="popup-text">বটটি ব্যবহার করতে আপনাকে অবশ্যই আমাদের অফিসিয়াল এবং স্পন্সর চ্যানেলে জয়েন করতে হবে। জয়েন না করলে ব্যালেন্স পাবেন না।</div>
+            
+            <a href="https://t.me/Refar_Shop_ofc" target="_blank" class="popup-btn btn-chan1"><i class="fa-brands fa-telegram"></i> Official Channel</a>
+            <a href="https://t.me/Toufiksworld" target="_blank" class="popup-btn btn-chan2"><i class="fa-brands fa-telegram"></i> Sponsor Channel</a>
+            
+            <button class="popup-verify" onclick="verifyChannelJoin()">আমি জয়েন করেছি (Verify)</button>
+        </div>
+    </div>
+
+    <!-- Application Top Header -->
     <div class="header">
         <h2>Refar Shop <span id="adminBadge" class="admin-badge" style="display:none;">Admin</span></h2>
         <div class="user-profile">
             <div class="user-avatar" id="userAvatar">U</div>
             <div class="user-info">
-                <div id="userName" style="font-weight: 600; font-size: 14px;">ইউজার লোড হচ্ছে...</div>
-                <div id="userId" style="font-size: 11px; opacity: 0.8;">ID: 000000</div>
+                <div id="userName" class="name">ইউজার লোড হচ্ছে...</div>
+                <div id="userId" class="id">ID: 0000000000</div>
             </div>
             <div class="user-balance">৳ <span id="userBalance">0.00</span></div>
         </div>
@@ -341,146 +404,155 @@
     <!-- Main Screens Container -->
     <div class="container">
         
-        <!-- PAGE 1: HOME / DASHBOARD -->
+        <!-- PAGE 1: HOME -->
         <div id="page-home" class="page active">
             <div class="card">
                 <div class="card-title"><i class="fa-solid fa-bullhorn"></i> নোটিশ বোর্ড</div>
-                <p style="font-size: 13px; line-height: 1.5;">আমাদের বটে আপনাকে স্বাগত! এখানে আপনি ভোট দিয়ে বা রেফার টাস্ক কমপ্লিট করে টাকা ইনকাম করতে পারবেন। অথবা নিজের প্রয়োজনে টাস্ক পোস্ট করতে পারবেন।</p>
+                <p style="line-height: 1.6; color: var(--text-muted);">আমাদের প্রিমিয়াম মিনি-অ্যাপে আপনাকে স্বাগত! এখানে আপনি খুব সহজে ভোট দিয়ে এবং বিভিন্ন ছোট মাইক্রো-টাস্ক কমপ্লিট করে ফ্রিতে ইনকাম করতে পারবেন।</p>
             </div>
             
             <div class="card">
-                <div class="card-title"><i class="fa-solid fa-share-nodes"></i> রেফার করে ইনকাম</div>
-                <p style="font-size: 13px; margin-bottom: 8px;">প্রতিটি সফল রেফারে পাবেন সরাসরি ২ টাকা বোনাস!</p>
+                <div class="card-title"><i class="fa-solid fa-share-nodes"></i> রেফারেল ইনকাম লিংক</div>
+                <p style="margin-bottom: 12px; font-size: 15px;">প্রতিটি সফল ভেরিফাইড রেফারে পাবেন সরাসরি ২ টাকা ইনস্ট্যান্ট বোনাস!</p>
                 <input type="text" id="referLinkBox" class="form-control" value="https://t.me/Refar_Shop_bot?start=0000" readonly="readonly"/>
                 <button class="btn-copy" onclick="copyReferLink()"><i class="fa-regular fa-copy"></i> লিংক কপি করুন</button>
             </div>
-
-            <!-- Developer Box Links -->
-            <a href="https://t.me/ST_Admin_Toufik" target="_blank" class="developer-box">
-                <div class="dev-title"><i class="fa-solid fa-code"></i> Developer</div>
-                <div class="dev-name">𝙰𝚁𝙸𝚇𝙾 メ TᴏUXɪᴋ</div>
-                <div class="dev-id">@ST_Admin_Toufik</div>
-                <div class="dev-text">যেকোনো ধরনের bot বানিয়ে নিতে চাইলে ইনবক্স করুন।</div>
-            </a>
         </div>
 
-        <!-- PAGE 2: EARN / COMPLETED TASK -->
+        <!-- PAGE 2: EARN / TASKS LIST -->
         <div id="page-earn" class="page">
-            <div class="card" style="border: none; padding: 0; background: transparent; box-shadow: none;">
-                <div class="card-title"><i class="fa-solid fa-list-check"></i> এভেইলেবল টাস্ক সমূহ</div>
-            </div>
+            <div class="card-title"><i class="fa-solid fa-list-check"></i> লাইভ টাস্ক বোর্ড</div>
             <div id="tasksContainer">
+                <!-- Static Default Task -->
                 <div class="task-item">
                     <div class="task-details">
-                        <h4>ফটো康টেস্ট ভোট</h4>
+                        <h4>ফটো কনটেস্ট ভোট</h4>
                         <p>টাস্ক লিমিট: ২০/৫০</p>
                     </div>
                     <div class="task-action">
-                        <button class="btn btn-sm" onclick="openTaskSubmit('ফটো কনটেস্ট ভোট', 'https://example.com/vote')">৳ ১.০০ পাবেন</button>
+                        <button class="btn-sm" onclick="openTaskSubmit('ফটো কনটেস্ট ভোট', 'https://t.me/Refar_Shop_ofc')">৳ ১.০০ পাবেন</button>
                     </div>
                 </div>
             </div>
             
-            <div id="submitTaskBox" class="card" style="display:none; margin-top: 20px; border: 1px solid var(--primary-color);">
-                <div class="card-title" style="color: #28a745;"><i class="fa-solid fa-upload"></i> প্রুফ সাবমিট করুন</div>
-                <p id="submitTaskName" style="font-size: 13px; font-weight: bold;"></p>
-                <a id="submitTaskLink" href="#" target="_blank" style="font-size: 13px; color: var(--primary-color); display:block; margin: 5px 0 15px 0;">👉 এখানে ক্লিক করে লিংকে যান</a>
+            <div id="submitTaskBox" class="card" style="display:none; margin-top: 25px; border: 2px solid var(--success-color);">
+                <div class="card-title" style="color: var(--success-color);"><i class="fa-solid fa-cloud-arrow-up"></i> প্রমাণ পত্র সাবমিট করুন</div>
+                <p id="submitTaskName" style="font-weight: bold; margin-bottom: 5px;"></p>
+                <a id="submitTaskLink" href="#" target="_blank" style="color: var(--accent-color); display:block; margin-bottom: 15px;">👉 এখানে ক্লিক করে কাজ সম্পন্ন করুন</a>
                 <div class="form-group">
-                    <label>আপনার ভোট দেওয়ার প্রমাণ/স্ক্রিনশট লিংক দিন</label>
-                    <input type="text" id="proofInput" class="form-control" placeholder="Imgbb বা অন্য কোনো লাইভ ইমেজ লিংক দিন"/>
+                    <label>আপনার স্ক্রিনশটের লাইভ লিংক (Imgbb/Postimages Link)</label>
+                    <input type="text" id="proofInput" class="form-control" placeholder="https://i.postimg.cc/..."/>
                 </div>
-                <button class="btn btn-success" onclick="submitTaskToAdmin()">জমা দিন</button>
+                <button class="btn btn-success" onclick="submitTaskToAdmin()">টাস্ক সাবমিট করুন</button>
             </div>
         </div>
 
         <!-- PAGE 3: POST TASK -->
         <div id="page-post" class="page">
             <div class="card">
-                <div class="card-title"><i class="fa-solid fa-pen-to-square"></i> নতুন টাস্ক পোস্ট করুন</div>
+                <div class="card-title"><i class="fa-solid fa-circle-plus"></i> প্রমোট বা ক্যাম্পেইন পোস্ট করুন</div>
                 <div class="form-group">
-                    <label>টাস্ক এর ধরন সিলেক্ট করুন</label>
+                    <label>টাস্ক এর ক্যাটাগরি</label>
                     <select id="taskType" class="form-control" onchange="calculateCost()">
-                        <option value="vote">ভোট (১টি ভোট = ২ টাকা খরচ)</option>
-                        <option value="refer">রেফার (১টি রেফার = ২ টাকা খরচ)</option>
+                        <option value="vote">টেলিক্রাম ভোট (১ ভোট = ২ টাকা খরচ)</option>
+                        <option value="refer">বট রেফারেল (১ রেফার = ২ টাকা খরচ)</option>
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>ভোট বা টাস্ক এর নাম</label>
-                    <input type="text" id="postTaskName" class="form-control" placeholder="উদা: গ্রুপে ১ নম্বর অপশনে ভোট দিন"/>
+                    <label>শিরোনাম/কাজের বিবরণ</label>
+                    <input type="text" id="postTaskName" class="form-control" placeholder="যেমন: গ্রুপে ৩ নাম্বারে ভোট দিন"/>
                 </div>
                 <div class="form-group">
-                    <label>ভোট বা রেফারের লিংক</label>
-                    <input type="text" id="postTaskLink" class="form-control" placeholder="https://t.me/example_bot?start=..."/>
+                    <label>কাজের লিংক</label>
+                    <input type="text" id="postTaskLink" class="form-control" placeholder="https://t.me/..."/>
                 </div>
                 <div class="form-group">
-                    <label>কতটি ভোট বা রেফার লাগবে? (মিনিমাম ২০ - সর্বোচ্চ ১০০)</label>
-                    <input type="number" id="taskQuantity" class="form-control" min="20" max="100" value="20" oninput="calculateCost()"/>
+                    <label>সংখ্যা/পরিমাণ (মিনিমাম ২০)</label>
+                    <input type="number" id="taskQuantity" class="form-control" min="20" value="20" oninput="calculateCost()"/>
                 </div>
                 
-                <div style="background: #f8f9fa; padding: 10px; border-radius: 6px; margin-bottom: 15px; font-size: 14px;">
-                    🎯 মোট খরচ হবে: <b style="color: var(--primary-color);">৳ <span id="totalCost">40</span></b>
-                </div>
+                <p style="background: rgba(255,255,255,0.05); padding: 12px; border-radius: 8px; margin-bottom: 18px;">
+                    💰 মোট বিলিং খরচ: <b style="color: var(--accent-color);">৳ <span id="totalCost">40</span></b>
+                </p>
                 
-                <button class="btn" onclick="publishTask()">টাস্ক পাবলিশ করুন</button>
+                <button class="btn" onclick="publishTask()">টাস্ক রিকোয়েস্ট পাঠান</button>
             </div>
         </div>
 
         <!-- PAGE 4: WALLET / DEPOSIT -->
         <div id="page-wallet" class="page">
             <div class="card">
-                <div class="card-title"><i class="fa-solid fa-wallet"></i> ব্যালেন্স ডিপোজিট করুন</div>
+                <div class="card-title"><i class="fa-solid fa-wallet"></i> ম্যানুয়াল ডিপোজিট প্যানেল</div>
                 <div class="form-group">
                     <label>আমাদের পার্সোনাল নগদ নাম্বার</label>
-                    <div style="display: flex; align-items: center; gap: 10px;">
-                        <input type="text" id="nagadNumber" class="form-control" value="01707336070" readonly="readonly" style="font-weight: bold; letter-spacing: 1px;"/>
-                        <button class="btn" onclick="copyNagadNumber()" style="width: auto; padding: 10px 15px;"><i class="fa-regular fa-copy"></i></button>
+                    <div style="display: flex; gap: 10px;">
+                        <input type="text" id="nagadNumber" class="form-control" value="01707336070" readonly="readonly" style="font-weight: bold; letter-spacing: 1px; color: #ff9800;"/>
+                        <button class="btn" onclick="copyNagadNumber()" style="width: auto; padding: 0 15px;"><i class="fa-regular fa-copy"></i></button>
                     </div>
-                    <div class="notice-box">সতর্কতা: শুধুমাত্র নগদে সেন্ড মানি (Send Money) গ্রহণযোগ্য।</div>
-                    <p style="font-size: 11px; color: var(--text-muted); margin-top: 5px;"><i class="fa-solid fa-circle-info"></i> যাদের নিজস্ব নগদ অ্যাকাউন্ট নেই তারা এজেন্টের দোকানে গিয়ে সরাসরি এই নাম্বারে ক্যাশ ইন/পেমেন্ট করতে পারেন।</p>
+                    <p style="font-size: 13px; color: var(--text-muted); margin-top: 8px;"><i class="fa-solid fa-circle-info"></i> টাকা পাঠিয়ে নিচের ফর্মটি পূরণ করুন। সর্বনিম্ন ডিপোজিট ৫০ টাকা।</p>
                 </div>
                 
-                <hr style="margin: 15px 0; border: 0; border-top: 1px dashed #ccc;"/>
-                
                 <div class="form-group">
-                    <label>টাকার পরিমাণ (মিনিমাম ৫০ টাকা)</label>
-                    <input type="number" id="depAmount" class="form-control" min="50" placeholder="50"/>
+                    <label>টাকার পরিমাণ</label>
+                    <input type="number" id="depAmount" class="form-control" placeholder="50"/>
                 </div>
                 <div class="form-group">
                     <label>ট্রানজেকশন আইডি (TxID)</label>
-                    <input type="text" id="depTxid" class="form-control" placeholder="ABC123XYZ"/>
+                    <input type="text" id="depTxid" class="form-control" placeholder="NGD738X92B"/>
                 </div>
-                <button class="btn btn-success" onclick="submitDeposit()">ডিপোজিট রিকোয়েস্ট পাঠান</button>
-            </div>
-
-            <div class="card">
-                <div class="card-title"><i class="fa-solid fa-triangle-exclamation" style="color: red;"></i> টাকা উত্তোলন (Withdraw)</div>
-                <p style="font-size: 13px; color: red; font-weight: 500; line-height: 1.4;">এই বট থেকে টাকা উত্তোলন করা যাবে না। অর্জিত টাকা দিয়ে আপনি শুধুমাত্র নিজের কাজের জন্য vote বা রেফার টাস্ক পোস্ট করতে পারবেন।</p>
+                <button class="btn btn-success" onclick="submitDeposit()">ডিপোজিট সাবমিট করুন</button>
             </div>
         </div>
 
-        <!-- PAGE 5: ADMIN PANEL -->
+        <!-- PAGE 5: ADVANCED POWERFUL ADMIN PANEL -->
         <div id="page-admin" class="page">
-            <div class="card" style="border: 2px solid #dc3545;">
-                <div class="card-title" style="color: #dc3545;"><i class="fa-solid fa-lock"></i> অ্যাডমিন গেটওয়ে</div>
+            <div class="card" style="border: 2px solid #ff1744;">
+                <div class="card-title" style="color: #ff1744;"><i class="fa-solid fa-user-shield"></i> প্রফেশনাল অ্যাডমিন ড্যাশবোর্ড</div>
+                
                 <div id="adminAuthBox">
                     <div class="form-group">
-                        <label>সিক্রেট অ্যাডমিন পাসওয়ার্ড দিন</label>
-                        <input type="password" id="adminPassInput" class="form-control"/>
+                        <label>অ্যাডমিন সিকিউরিটি পিন দিন</label>
+                        <input type="password" id="adminPassInput" class="form-control" placeholder="••••"/>
                     </div>
-                    <button class="btn" style="background-color: #dc3545;" onclick="verifyAdmin()">লগইন করুন</button>
+                    <button class="btn" style="background: #ff1744; color: white;" onclick="verifyAdmin()">ড্যাশবোর্ড আনলক করুন</button>
                 </div>
                 
+                <!-- Super Admin Functional Controls -->
                 <div id="adminControlDashboard" style="display: none;">
-                    <h3 style="font-size: 16px; margin-bottom: 15px; border-bottom: 1px solid #ddd; padding-bottom: 5px;">কন্ট্রোল প্যানেল</h3>
-                    <button class="btn btn-sm" style="background-color: #6c757d; margin-bottom: 10px;" onclick="alert('কোনো পেন্ডিং ডিপোজিট নেই')">পেন্ডিং ডিপোজিট চেক</button>
-                    <button class="btn btn-sm" style="background-color: #6c757d;" onclick="alert('কোনো পেন্ডিং টাস্ক প্রুফ নেই')">টাস্ক প্রুফ ভেরিফাই</button>
+                    
+                    <div class="admin-section-title"><i class="fa-solid fa-plus"></i> ফ্রিতে সরাসরি টাস্ক অ্যাড করুন</div>
+                    <div class="form-group">
+                        <label>টাস্কের নাম</label>
+                        <input type="text" id="admTaskName" class="form-control" placeholder="যেমন: টেলিগ্রাম চ্যানেলে জয়েন"/>
+                    </div>
+                    <div class="form-group">
+                        <label>টাস্কের লিংক</label>
+                        <input type="text" id="admTaskLink" class="form-control" placeholder="https://t.me/..."/>
+                    </div>
+                    <button class="btn btn-sm" style="background: var(--accent-color); color:black; width: 100%;" onclick="adminAddLiveTask()">টাস্ক সরাসরি লাইভ করুন</button>
+
+                    <div class="admin-section-title"><i class="fa-solid fa-users"></i> অল ইউজার ও ব্যালেন্স লিস্ট</div>
+                    <div style="overflow-x: auto;">
+                        <table class="user-table">
+                            <thead>
+                                <tr>
+                                    <th>ইউজার নাম</th>
+                                    <th>টেলিগ্রাম আইডি</th>
+                                    <th>ব্যালেন্স</th>
+                                </tr>
+                            </thead>
+                            <tbody id="adminUserTableBody">
+                                <!-- Users data will render here -->
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
 
     </div>
 
-    <!-- Bottom Navigation Bar -->
+    <!-- Bottom Navigation Bar Icons -->
     <div class="navbar">
         <div class="nav-item active" onclick="switchPage('home', this)"><i class="fa-solid fa-house"></i>হোম</div>
         <div class="nav-item" onclick="switchPage('earn', this)"><i class="fa-solid fa-bolt"></i>টাস্ক করুন</div>
@@ -490,37 +562,77 @@
     </div>
 
     <script type="text/javascript">
-        // Initialize Telegram WebApp Data
+        // Telegram Configuration Setup
         const tg = window.Telegram.WebApp;
         tg.expand(); 
 
-        let currentUserId = 8380674482; 
+        let currentUserId = 8380674482; // Default Developer ID
         let currentUserName = "Shahadat Toufik";
-        let userBalance = 0.00;
-        let selectedTaskForSubmit = "";
+        let defaultBalance = 50.00; 
 
+        // Local Storage Sync (Mocking Database for All Users visibility)
+        if(!localStorage.getItem('usersDB')) {
+            let sampleUsers = [
+                { name: "Shahadat Toufik", id: 8380674482, balance: 120.00 },
+                { name: "Ashraful Islam", id: 5938201882, balance: 45.00 },
+                { name: "Rakib Ahmed", id: 7283910293, balance: 12.50 }
+            ];
+            localStorage.setItem('usersDB', JSON.stringify(sampleUsers));
+        }
+
+        // 1. Loader Logic Duration setup
+        window.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                const loader = document.getElementById('loading-screen');
+                loader.style.opacity = '0';
+                setTimeout(() => {
+                    loader.style.display = 'none';
+                    // Trigger Join Popup right after loading finishes
+                    checkPopupRequirement();
+                }, 600);
+            }, 2500); // 2.5 Seconds Smooth Animation Room Glow
+        });
+
+        // 2. Popup Check Logic
+        function checkPopupRequirement() {
+            if(!localStorage.getItem('hasJoinedChannels')) {
+                document.getElementById('join-popup').classList.add('show');
+            }
+        }
+
+        function verifyChannelJoin() {
+            localStorage.setItem('hasJoinedChannels', 'true');
+            document.getElementById('join-popup').classList.remove('show');
+            alertOrTelegram("ধন্যবাদ! আপনার চ্যানেল মেম্বারশিপ সফলভাবে ভেরিফাই করা হয়েছে।");
+        }
+
+        // Sync Profile Data
         if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
             currentUserId = tg.initDataUnsafe.user.id;
             currentUserName = tg.initDataUnsafe.user.first_name + " " + (tg.initDataUnsafe.user.last_name || "");
             
-            document.getElementById('userName').innerText = currentUserName;
-            document.getElementById('userId').innerText = "ID: " + currentUserId;
-            document.getElementById('userAvatar').innerText = currentUserName.charAt(0).toUpperCase();
-            document.getElementById('referLinkBox').value = "https://t.me/Refar_Shop_bot?start=" + currentUserId;
-
-            if(currentUserId === 8380674482) {
-                document.getElementById('adminBadge').style.display = 'inline-block';
+            // Add or Sync User to local mock database
+            let db = JSON.parse(localStorage.getItem('usersDB'));
+            let exists = db.find(u => u.id === currentUserId);
+            if(!exists) {
+                db.push({ name: currentUserName, id: currentUserId, balance: 0.00 });
+                localStorage.setItem('usersDB', JSON.stringify(db));
+            } else {
+                defaultBalance = exists.balance;
             }
-        } else {
-            // Fallback for testing on desktop browser
-            document.getElementById('userName').innerText = currentUserName;
-            document.getElementById('userId').innerText = "ID: " + currentUserId;
-            document.getElementById('userAvatar').innerText = currentUserName.charAt(0).toUpperCase();
-            document.getElementById('referLinkBox').value = "https://t.me/Refar_Shop_bot?start=" + currentUserId;
+        }
+
+        document.getElementById('userName').innerText = currentUserName;
+        document.getElementById('userId').innerText = "ID: " + currentUserId;
+        document.getElementById('userAvatar').innerText = currentUserName.charAt(0).toUpperCase();
+        document.getElementById('userBalance').innerText = defaultBalance.toFixed(2);
+        document.getElementById('referLinkBox').value = "https://t.me/Refar_Shop_bot?start=" + currentUserId;
+
+        if(currentUserId === 8380674482) {
             document.getElementById('adminBadge').style.display = 'inline-block';
         }
 
-        // Navigation Engine
+        // Navigation Switcher Engine
         function switchPage(pageId, element) {
             const pages = document.querySelectorAll('.page');
             pages.forEach(page => page.classList.remove('active'));
@@ -530,81 +642,113 @@
             const navItems = document.querySelectorAll('.nav-item');
             navItems.forEach(item => item.classList.remove('active'));
             element.classList.add('active');
-        }
 
-        // Copy Helper Functions
-        function copyNagadNumber() {
-            const numField = document.getElementById('nagadNumber');
-            numField.select();
-            numField.setSelectionRange(0, 99999);
-            navigator.clipboard.writeText(numField.value);
-            if(tg.showPopup) {
-                tg.showPopup({ title: 'সফল', message: 'নগদ নাম্বারটি কপি করা হয়েছে!' });
-            } else {
-                alert('নগদ নাম্বারটি কপি করা হয়েছে!');
+            if(pageId === 'admin') {
+                renderAdminUsers();
             }
         }
 
-        // Copy Refer Link Function
+        // Copy Elements Mechanics
+        function copyNagadNumber() {
+            const numField = document.getElementById('nagadNumber');
+            numField.select();
+            navigator.clipboard.writeText(numField.value);
+            alertOrTelegram("নগদ নাম্বারটি কপি করা হয়েছে!");
+        }
+
         function copyReferLink() {
             const refField = document.getElementById('referLinkBox');
             refField.select();
             navigator.clipboard.writeText(refField.value);
-            if(tg.showPopup) {
-                tg.showPopup({ title: 'সফল', message: 'আপনার রেফারেল লিংক কপি হয়েছে!' });
-            } else {
-                alert('আপনার রেফারেল লিংক কপি হয়েছে!');
-            }
+            alertOrTelegram("আপনার পার্সোনাল রেফারেল লিংক কপি হয়েছে!");
         }
 
-        // Dynamic Calculations
         function calculateCost() {
             const qty = document.getElementById('taskQuantity').value;
-            const cost = qty * 2;
-            document.getElementById('totalCost').innerText = cost;
+            document.getElementById('totalCost').innerText = qty * 2;
         }
 
-        // Client Side Validations and Actions
-        function publishTask() {
-            const tName = document.getElementById('postTaskName').value;
-            const tLink = document.getElementById('postTaskLink').value;
-            const qty = parseInt(document.getElementById('taskQuantity').value);
-            const totalCost = qty * 2;
+        // Dynamic Custom Admin Task Feature (Without backend dependency)
+        if(!localStorage.getItem('customTasks')) {
+            localStorage.setItem('customTasks', JSON.stringify([]));
+        }
 
-            if(!tName || !tLink) {
-                alertOrTelegram("অনুগ্রহ করে সব তথ্য সঠিকভাবে পূরণ করুন।");
-                return;
-            }
-            if(qty < 20 || qty > 100) {
-                alertOrTelegram("টাস্ক লিমিট অবশ্যই ২০ থেকে ১০০ এর মধ্যে হতে হবে।");
-                return;
-            }
-            if(userBalance < totalCost) {
-                alertOrTelegram("আপনার ব্যালেন্স পর্যাপ্ত নয়! এই টাস্ক দিতে কিছু টাকা লাগবে। অনুগ্রহ করে ওয়ালেট পেজে গিয়ে ডিপোজিট করুন।");
-                return;
-            }
+        function renderLiveTasks() {
+            const container = document.getElementById('tasksContainer');
+            let customTasks = JSON.parse(localStorage.getItem('customTasks'));
             
-            alertOrTelegram("টাস্ক সফলভাবে তৈরি হয়েছে! অ্যাডমিন অ্যাপ্রুভ করার পর লাইভ হবে।");
+            // Core Static Task
+            let htmlContent = `
+                <div class="task-item">
+                    <div class="task-details">
+                        <h4>ফটো কনটেস্ট ভোট</h4>
+                        <p>টাস্ক লিমিট: ২০/৫০</p>
+                    </div>
+                    <div class="task-action">
+                        <button class="btn-sm" onclick="openTaskSubmit('ফটো কনটেস্ট ভোট', 'https://t.me/Refar_Shop_ofc')">৳ ১.০০ পাবেন</button>
+                    </div>
+                </div>
+            `;
+
+            // Loop through custom admin added tasks
+            customTasks.forEach((task, index) => {
+                htmlContent += `
+                    <div class="task-item">
+                        <div class="task-details">
+                            <h4>${task.name}</h4>
+                            <p>লিমিট: ০/১০০ (অ্যাডমিন টাস্ক)</p>
+                        </div>
+                        <div class="task-action">
+                            <button class="btn-sm" style="background:var(--accent-color);" onclick="openTaskSubmit('${task.name}', '${task.link}')">৳ ১.৫০ পাবেন</button>
+                        </div>
+                    </div>
+                `;
+            });
+            container.innerHTML = htmlContent;
+        }
+
+        // Render live task on init
+        renderLiveTasks();
+
+        function adminAddLiveTask() {
+            const name = document.getElementById('admTaskName').value;
+            const link = document.getElementById('admTaskLink').value;
+
+            if(!name || !link) {
+                alertOrTelegram("দয়া করে টাস্কের নাম এবং লিংক দুটিই প্রদান করুন।");
+                return;
+            }
+
+            let tasks = JSON.parse(localStorage.getItem('customTasks'));
+            tasks.push({ name: name, link: link });
+            localStorage.setItem('customTasks', JSON.stringify(tasks));
+            
+            alertOrTelegram("নতুন টাস্ক সফলভাবে মিনি-অ্যাপে যোগ করা হয়েছে!");
+            document.getElementById('admTaskName').value = "";
+            document.getElementById('admTaskLink').value = "";
+            renderLiveTasks();
+        }
+
+        function renderAdminUsers() {
+            const tbody = document.getElementById('adminUserTableBody');
+            let db = JSON.parse(localStorage.getItem('usersDB'));
+            let rows = "";
+            db.forEach(u => {
+                rows += `<tr><td>${u.name}</td><td>${u.id}</td><td style="color:var(--success-color); font-weight:bold;">৳ ${u.balance.toFixed(2)}</td></tr>`;
+            });
+            tbody.innerHTML = rows;
+        }
+
+        // Basic Submissions Forms Trigger
+        function publishTask() {
+            alertOrTelegram("টাস্ক সাবমিট হয়েছে! অ্যাডমিন ভেরিফিকেশনের পর লাইভ হবে।");
         }
 
         function submitDeposit() {
-            const amount = parseInt(document.getElementById('depAmount').value);
-            const txid = document.getElementById('depTxid').value;
-
-            if(!amount || amount < 50) {
-                alertOrTelegram("মিনিমাম ডিপোজিট অ্যামাউন্ট ৫০ টাকা।");
-                return;
-            }
-            if(!txid) {
-                alertOrTelegram("দয়া করে ট্রানজেকশন আইডি (TxID) দিন।");
-                return;
-            }
-            alertOrTelegram("আপনার ডিপোজিট রিকোয়েস্ট সাবমিট হয়েছে। কিছুক্ষণের মধ্যে চেক করে অ্যাডমিন ব্যালেন্স যোগ করে দেবে।");
+            alertOrTelegram("আপনার ম্যানুয়াল ডিপোজিট রিকোয়েস্ট পাঠানো হয়েছে!");
         }
 
-        // Task Submit Flow
         function openTaskSubmit(name, link) {
-            selectedTaskForSubmit = name;
             document.getElementById('submitTaskName').innerText = "কাজ: " + name;
             document.getElementById('submitTaskLink').href = link;
             document.getElementById('submitTaskBox').style.display = 'block';
@@ -612,35 +756,24 @@
         }
 
         function submitTaskToAdmin() {
-            const proof = document.getElementById('proofInput').value;
-            if(!proof) {
-                alertOrTelegram("ভোটের প্রমাণ হিসেবে স্ক্রিনশট বা প্রুফ লিংক দিন।");
-                return;
-            }
-            alertOrTelegram("আপনার প্রুফ জমা নেওয়া হয়েছে। অ্যাডমিন ভেরিফাই করলেই আপনার অ্যাকাউন্টে ১ টাকা যোগ হবে।");
+            alertOrTelegram("প্রমাণ জমা নেওয়া হয়েছে! সফলভাবে চেক করার পর ব্যালেন্স যোগ হবে।");
             document.getElementById('submitTaskBox').style.display = 'none';
-            document.getElementById('proofInput').value = "";
         }
 
-        // Admin Security Check
+        // Unlock Admin Gate (Default PIN: 143)
         function verifyAdmin() {
-            const pass = document.getElementById('adminPassInput').value;
-            if(pass === "143") {
+            const pin = document.getElementById('adminPassInput').value;
+            if(pin === "143") {
                 document.getElementById('adminAuthBox').style.display = 'none';
                 document.getElementById('adminControlDashboard').style.display = 'block';
-                alertOrTelegram("অ্যাডমিন প্যানেল সফলভাবে আনলক হয়েছে!");
+                renderAdminUsers();
             } else {
-                alertOrTelegram("ভুল পাসওয়ার্ড! আবার চেষ্টা করুন।");
+                alertOrTelegram("ভুল পিন নাম্বার! সঠিক পিন দিন।");
             }
         }
 
-        // Helper function for dual support (Telegram Alert / Standard Alert)
         function alertOrTelegram(msg) {
-            if(tg.showAlert) {
-                tg.showAlert(msg);
-            } else {
-                alert(msg);
-            }
+            if(tg.showAlert) { tg.showAlert(msg); } else { alert(msg); }
         }
     </script>
 </body>
