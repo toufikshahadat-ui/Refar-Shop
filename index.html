@@ -1,26 +1,647 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="bn">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Refar Shop</title>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+    <title>Refar Shop App</title>
+
+    <!-- Telegram WebApp Script -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+    
     <style>
+        :root {
+            --primary-color: #007bff;
+            --secondary-color: #0056b3;
+            --bg-color: #f4f7f6;
+            --card-bg: #ffffff;
+            --text-color: #333333;
+            --text-muted: #777777;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
         body {
-            font-family: Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            padding-bottom: 80px;
+            overflow-x: hidden;
+        }
+
+        /* Top Header */
+        .header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 20px 15px;
             text-align: center;
-            margin-top: 50px;
-            background-color: #f4f4f9;
+            border-bottom-left-radius: 20px;
+            border-bottom-right-radius: 20px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         }
-        h1 {
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 10px;
+            background: rgba(255, 255, 255, 0.15);
+            padding: 10px 15px;
+            border-radius: 50px;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            background: white;
+            color: var(--primary-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .user-info {
+            text-align: left;
+            flex-grow: 1;
+        }
+
+        .user-balance {
+            background: #ffffff;
+            color: var(--primary-color);
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        /* Container and Pages */
+        .container {
+            padding: 15px;
+        }
+
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        /* Cards and UI Elements */
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--secondary-color);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Form Inputs */
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #dddddd;
+            border-radius: 8px;
+            outline: none;
+            font-size: 14px;
+            background-color: #fafafa;
+            transition: 0.3s;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-color);
+            background-color: #ffffff;
+        }
+
+        /* Buttons */
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn:active {
+            background-color: var(--secondary-color);
+            transform: scale(0.98);
+        }
+
+        .btn-success { background-color: #28a745; }
+        
+        .btn-copy {
+            background-color: #e9ecef;
+            color: #495057;
+            padding: 8px 15px;
+            font-size: 13px;
+            border-radius: 6px;
+            display: inline-block;
+            width: auto;
+            margin-top: 5px;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        /* Micro Tasks List */
+        .task-item {
+            border-left: 4px solid var(--primary-color);
+            background: #fdfdfd;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+        }
+
+        .task-details h4 {
+            font-size: 14px;
+            margin-bottom: 3px;
+        }
+        .task-details p {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .task-action .btn-sm {
+            padding: 6px 12px;
+            font-size: 12px;
+            border-radius: 6px;
+            width: auto;
+            display: inline-block;
+        }
+
+        /* Copy Notice and Tips */
+        .notice-box {
+            background-color: #e8f4fd;
+            border-left: 4px solid var(--primary-color);
+            padding: 10px;
+            font-size: 12px;
+            color: #1d6fa5;
+            border-radius: 4px;
+            margin-top: 10px;
+        }
+
+        /* Developer Box Section */
+        .developer-box {
+            background: linear-gradient(135deg, #ffffff, #eef5fc);
+            border: 1px solid #bce0fd;
+            border-radius: 12px;
+            padding: 15px;
+            margin-top: 20px;
+            margin-bottom: 15px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0,123,255,0.05);
+            text-decoration: none;
+            display: block;
+            color: inherit;
+            transition: 0.3s;
+        }
+        
+        .developer-box:active {
+            transform: scale(0.98);
+            background: linear-gradient(135deg, #eef5fc, #ffffff);
+        }
+
+        .dev-title {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+            font-weight: bold;
+        }
+
+        .dev-name {
+            font-size: 16px;
+            font-weight: bold;
             color: #333;
+            margin-bottom: 2px;
         }
-        p {
-            color: #666;
+
+        .dev-id {
+            font-size: 13px;
+            color: var(--primary-color);
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .dev-text {
+            font-size: 12px;
+            color: #555;
+            background: #ffffff;
+            padding: 6px 10px;
+            border-radius: 20px;
+            display: inline-block;
+            border: 1px dashed var(--primary-color);
+        }
+
+        /* Bottom Nav Bar */
+        .navbar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background-color: white;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+            z-index: 1000;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: var(--text-muted);
+            font-size: 11px;
+            text-decoration: none;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .nav-item i {
+            font-size: 20px;
+            margin-bottom: 2px;
+        }
+
+        .nav-item.active {
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+
+        /* Admin Section Styling */
+        .admin-badge {
+            background: #dc3545;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 10px;
+            margin-left: 5px;
         }
     </style>
 </head>
 <body>
-    <h1>Welcome to Refar Shop</h1>
-    <p>This is your new website hosted on GitHub!</p>
+
+    <!-- Header Section -->
+    <div class="header">
+        <h2>Refar Shop <span id="adminBadge" class="admin-badge" style="display:none;">Admin</span></h2>
+        <div class="user-profile">
+            <div class="user-avatar" id="userAvatar">U</div>
+            <div class="user-info">
+                <div id="userName" style="font-weight: 600; font-size: 14px;">ইউজার লোড হচ্ছে...</div>
+                <div id="userId" style="font-size: 11px; opacity: 0.8;">ID: 000000</div>
+            </div>
+            <div class="user-balance">৳ <span id="userBalance">0.00</span></div>
+        </div>
+    </div>
+
+    <!-- Main Screens Container -->
+    <div class="container">
+        
+        <!-- PAGE 1: HOME / DASHBOARD -->
+        <div id="page-home" class="page active">
+            <div class="card">
+                <div class="card-title"><i class="fa-solid fa-bullhorn"></i> নোটিশ বোর্ড</div>
+                <p style="font-size: 13px; line-height: 1.5;">আমাদের বটে আপনাকে স্বাগত! এখানে আপনি ভোট দিয়ে বা রেফার টাস্ক কমপ্লিট করে টাকা ইনকাম করতে পারবেন। অথবা নিজের প্রয়োজনে টাস্ক পোস্ট করতে পারবেন।</p>
+            </div>
+            
+            <div class="card">
+                <div class="card-title"><i class="fa-solid fa-share-nodes"></i> রেফার করে ইনকাম</div>
+                <p style="font-size: 13px; margin-bottom: 8px;">প্রতিটি সফল রেফারে পাবেন সরাসরি ২ টাকা বোনাস!</p>
+                <input type="text" id="referLinkBox" class="form-control" value="https://t.me/Refar_Shop_bot?start=0000" readonly="readonly"/>
+                <button class="btn-copy" onclick="copyReferLink()"><i class="fa-regular fa-copy"></i> লিংক কপি করুন</button>
+            </div>
+
+            <!-- Developer Box Links -->
+            <a href="https://t.me/ST_Admin_Toufik" target="_blank" class="developer-box">
+                <div class="dev-title"><i class="fa-solid fa-code"></i> Developer</div>
+                <div class="dev-name">𝙰𝚁𝙸𝚇𝙾 メ TᴏUXɪᴋ</div>
+                <div class="dev-id">@ST_Admin_Toufik</div>
+                <div class="dev-text">যেকোনো ধরনের bot বানিয়ে নিতে চাইলে ইনবক্স করুন।</div>
+            </a>
+        </div>
+
+        <!-- PAGE 2: EARN / COMPLETED TASK -->
+        <div id="page-earn" class="page">
+            <div class="card" style="border: none; padding: 0; background: transparent; box-shadow: none;">
+                <div class="card-title"><i class="fa-solid fa-list-check"></i> এভেইলেবল টাস্ক সমূহ</div>
+            </div>
+            <div id="tasksContainer">
+                <div class="task-item">
+                    <div class="task-details">
+                        <h4>ফটো康টেস্ট ভোট</h4>
+                        <p>টাস্ক লিমিট: ২০/৫০</p>
+                    </div>
+                    <div class="task-action">
+                        <button class="btn btn-sm" onclick="openTaskSubmit('ফটো কনটেস্ট ভোট', 'https://example.com/vote')">৳ ১.০০ পাবেন</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="submitTaskBox" class="card" style="display:none; margin-top: 20px; border: 1px solid var(--primary-color);">
+                <div class="card-title" style="color: #28a745;"><i class="fa-solid fa-upload"></i> প্রুফ সাবমিট করুন</div>
+                <p id="submitTaskName" style="font-size: 13px; font-weight: bold;"></p>
+                <a id="submitTaskLink" href="#" target="_blank" style="font-size: 13px; color: var(--primary-color); display:block; margin: 5px 0 15px 0;">👉 এখানে ক্লিক করে লিংকে যান</a>
+                <div class="form-group">
+                    <label>আপনার ভোট দেওয়ার প্রমাণ/স্ক্রিনশট লিংক দিন</label>
+                    <input type="text" id="proofInput" class="form-control" placeholder="Imgbb বা অন্য কোনো লাইভ ইমেজ লিংক দিন"/>
+                </div>
+                <button class="btn btn-success" onclick="submitTaskToAdmin()">জমা দিন</button>
+            </div>
+        </div>
+
+        <!-- PAGE 3: POST TASK -->
+        <div id="page-post" class="page">
+            <div class="card">
+                <div class="card-title"><i class="fa-solid fa-pen-to-square"></i> নতুন টাস্ক পোস্ট করুন</div>
+                <div class="form-group">
+                    <label>টাস্ক এর ধরন সিলেক্ট করুন</label>
+                    <select id="taskType" class="form-control" onchange="calculateCost()">
+                        <option value="vote">ভোট (১টি ভোট = ২ টাকা খরচ)</option>
+                        <option value="refer">রেফার (১টি রেফার = ২ টাকা খরচ)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>ভোট বা টাস্ক এর নাম</label>
+                    <input type="text" id="postTaskName" class="form-control" placeholder="উদা: গ্রুপে ১ নম্বর অপশনে ভোট দিন"/>
+                </div>
+                <div class="form-group">
+                    <label>ভোট বা রেফারের লিংক</label>
+                    <input type="text" id="postTaskLink" class="form-control" placeholder="https://t.me/example_bot?start=..."/>
+                </div>
+                <div class="form-group">
+                    <label>কতটি ভোট বা রেফার লাগবে? (মিনিমাম ২০ - সর্বোচ্চ ১০০)</label>
+                    <input type="number" id="taskQuantity" class="form-control" min="20" max="100" value="20" oninput="calculateCost()"/>
+                </div>
+                
+                <div style="background: #f8f9fa; padding: 10px; border-radius: 6px; margin-bottom: 15px; font-size: 14px;">
+                    🎯 মোট খরচ হবে: <b style="color: var(--primary-color);">৳ <span id="totalCost">40</span></b>
+                </div>
+                
+                <button class="btn" onclick="publishTask()">টাস্ক পাবলিশ করুন</button>
+            </div>
+        </div>
+
+        <!-- PAGE 4: WALLET / DEPOSIT -->
+        <div id="page-wallet" class="page">
+            <div class="card">
+                <div class="card-title"><i class="fa-solid fa-wallet"></i> ব্যালেন্স ডিপোজিট করুন</div>
+                <div class="form-group">
+                    <label>আমাদের পার্সোনাল নগদ নাম্বার</label>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <input type="text" id="nagadNumber" class="form-control" value="01707336070" readonly="readonly" style="font-weight: bold; letter-spacing: 1px;"/>
+                        <button class="btn" onclick="copyNagadNumber()" style="width: auto; padding: 10px 15px;"><i class="fa-regular fa-copy"></i></button>
+                    </div>
+                    <div class="notice-box">সতর্কতা: শুধুমাত্র নগদে সেন্ড মানি (Send Money) গ্রহণযোগ্য।</div>
+                    <p style="font-size: 11px; color: var(--text-muted); margin-top: 5px;"><i class="fa-solid fa-circle-info"></i> যাদের নিজস্ব নগদ অ্যাকাউন্ট নেই তারা এজেন্টের দোকানে গিয়ে সরাসরি এই নাম্বারে ক্যাশ ইন/পেমেন্ট করতে পারেন।</p>
+                </div>
+                
+                <hr style="margin: 15px 0; border: 0; border-top: 1px dashed #ccc;"/>
+                
+                <div class="form-group">
+                    <label>টাকার পরিমাণ (মিনিমাম ৫০ টাকা)</label>
+                    <input type="number" id="depAmount" class="form-control" min="50" placeholder="50"/>
+                </div>
+                <div class="form-group">
+                    <label>ট্রানজেকশন আইডি (TxID)</label>
+                    <input type="text" id="depTxid" class="form-control" placeholder="ABC123XYZ"/>
+                </div>
+                <button class="btn btn-success" onclick="submitDeposit()">ডিপোজিট রিকোয়েস্ট পাঠান</button>
+            </div>
+
+            <div class="card">
+                <div class="card-title"><i class="fa-solid fa-triangle-exclamation" style="color: red;"></i> টাকা উত্তোলন (Withdraw)</div>
+                <p style="font-size: 13px; color: red; font-weight: 500; line-height: 1.4;">এই বট থেকে টাকা উত্তোলন করা যাবে না। অর্জিত টাকা দিয়ে আপনি শুধুমাত্র নিজের কাজের জন্য vote বা রেফার টাস্ক পোস্ট করতে পারবেন।</p>
+            </div>
+        </div>
+
+        <!-- PAGE 5: ADMIN PANEL -->
+        <div id="page-admin" class="page">
+            <div class="card" style="border: 2px solid #dc3545;">
+                <div class="card-title" style="color: #dc3545;"><i class="fa-solid fa-lock"></i> অ্যাডমিন গেটওয়ে</div>
+                <div id="adminAuthBox">
+                    <div class="form-group">
+                        <label>সিক্রেট অ্যাডমিন পাসওয়ার্ড দিন</label>
+                        <input type="password" id="adminPassInput" class="form-control"/>
+                    </div>
+                    <button class="btn" style="background-color: #dc3545;" onclick="verifyAdmin()">লগইন করুন</button>
+                </div>
+                
+                <div id="adminControlDashboard" style="display: none;">
+                    <h3 style="font-size: 16px; margin-bottom: 15px; border-bottom: 1px solid #ddd; padding-bottom: 5px;">কন্ট্রোল প্যানেল</h3>
+                    <button class="btn btn-sm" style="background-color: #6c757d; margin-bottom: 10px;" onclick="alert('কোনো পেন্ডিং ডিপোজিট নেই')">পেন্ডিং ডিপোজিট চেক</button>
+                    <button class="btn btn-sm" style="background-color: #6c757d;" onclick="alert('কোনো পেন্ডিং টাস্ক প্রুফ নেই')">টাস্ক প্রুফ ভেরিফাই</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Bottom Navigation Bar -->
+    <div class="navbar">
+        <div class="nav-item active" onclick="switchPage('home', this)"><i class="fa-solid fa-house"></i>হোম</div>
+        <div class="nav-item" onclick="switchPage('earn', this)"><i class="fa-solid fa-bolt"></i>টাস্ক করুন</div>
+        <div class="nav-item" onclick="switchPage('post', this)"><i class="fa-solid fa-circle-plus"></i>পোস্ট করুন</div>
+        <div class="nav-item" onclick="switchPage('wallet', this)"><i class="fa-solid fa-wallet"></i>ওয়ালেট</div>
+        <div class="nav-item" id="navAdminBtn" onclick="switchPage('admin', this)"><i class="fa-solid fa-user-shield"></i>অ্যাডমিন</div>
+    </div>
+
+    <script type="text/javascript">
+        // Initialize Telegram WebApp Data
+        const tg = window.Telegram.WebApp;
+        tg.expand(); 
+
+        let currentUserId = 8380674482; 
+        let currentUserName = "Shahadat Toufik";
+        let userBalance = 0.00;
+        let selectedTaskForSubmit = "";
+
+        if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
+            currentUserId = tg.initDataUnsafe.user.id;
+            currentUserName = tg.initDataUnsafe.user.first_name + " " + (tg.initDataUnsafe.user.last_name || "");
+            
+            document.getElementById('userName').innerText = currentUserName;
+            document.getElementById('userId').innerText = "ID: " + currentUserId;
+            document.getElementById('userAvatar').innerText = currentUserName.charAt(0).toUpperCase();
+            document.getElementById('referLinkBox').value = "https://t.me/Refar_Shop_bot?start=" + currentUserId;
+
+            if(currentUserId === 8380674482) {
+                document.getElementById('adminBadge').style.display = 'inline-block';
+            }
+        } else {
+            // Fallback for testing on desktop browser
+            document.getElementById('userName').innerText = currentUserName;
+            document.getElementById('userId').innerText = "ID: " + currentUserId;
+            document.getElementById('userAvatar').innerText = currentUserName.charAt(0).toUpperCase();
+            document.getElementById('referLinkBox').value = "https://t.me/Refar_Shop_bot?start=" + currentUserId;
+            document.getElementById('adminBadge').style.display = 'inline-block';
+        }
+
+        // Navigation Engine
+        function switchPage(pageId, element) {
+            const pages = document.querySelectorAll('.page');
+            pages.forEach(page => page.classList.remove('active'));
+            
+            document.getElementById('page-' + pageId).classList.add('active');
+
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => item.classList.remove('active'));
+            element.classList.add('active');
+        }
+
+        // Copy Helper Functions
+        function copyNagadNumber() {
+            const numField = document.getElementById('nagadNumber');
+            numField.select();
+            numField.setSelectionRange(0, 99999);
+            navigator.clipboard.writeText(numField.value);
+            if(tg.showPopup) {
+                tg.showPopup({ title: 'সফল', message: 'নগদ নাম্বারটি কপি করা হয়েছে!' });
+            } else {
+                alert('নগদ নাম্বারটি কপি করা হয়েছে!');
+            }
+        }
+
+        // Copy Refer Link Function
+        function copyReferLink() {
+            const refField = document.getElementById('referLinkBox');
+            refField.select();
+            navigator.clipboard.writeText(refField.value);
+            if(tg.showPopup) {
+                tg.showPopup({ title: 'সফল', message: 'আপনার রেফারেল লিংক কপি হয়েছে!' });
+            } else {
+                alert('আপনার রেফারেল লিংক কপি হয়েছে!');
+            }
+        }
+
+        // Dynamic Calculations
+        function calculateCost() {
+            const qty = document.getElementById('taskQuantity').value;
+            const cost = qty * 2;
+            document.getElementById('totalCost').innerText = cost;
+        }
+
+        // Client Side Validations and Actions
+        function publishTask() {
+            const tName = document.getElementById('postTaskName').value;
+            const tLink = document.getElementById('postTaskLink').value;
+            const qty = parseInt(document.getElementById('taskQuantity').value);
+            const totalCost = qty * 2;
+
+            if(!tName || !tLink) {
+                alertOrTelegram("অনুগ্রহ করে সব তথ্য সঠিকভাবে পূরণ করুন।");
+                return;
+            }
+            if(qty < 20 || qty > 100) {
+                alertOrTelegram("টাস্ক লিমিট অবশ্যই ২০ থেকে ১০০ এর মধ্যে হতে হবে।");
+                return;
+            }
+            if(userBalance < totalCost) {
+                alertOrTelegram("আপনার ব্যালেন্স পর্যাপ্ত নয়! এই টাস্ক দিতে কিছু টাকা লাগবে। অনুগ্রহ করে ওয়ালেট পেজে গিয়ে ডিপোজিট করুন।");
+                return;
+            }
+            
+            alertOrTelegram("টাস্ক সফলভাবে তৈরি হয়েছে! অ্যাডমিন অ্যাপ্রুভ করার পর লাইভ হবে।");
+        }
+
+        function submitDeposit() {
+            const amount = parseInt(document.getElementById('depAmount').value);
+            const txid = document.getElementById('depTxid').value;
+
+            if(!amount || amount < 50) {
+                alertOrTelegram("মিনিমাম ডিপোজিট অ্যামাউন্ট ৫০ টাকা।");
+                return;
+            }
+            if(!txid) {
+                alertOrTelegram("দয়া করে ট্রানজেকশন আইডি (TxID) দিন।");
+                return;
+            }
+            alertOrTelegram("আপনার ডিপোজিট রিকোয়েস্ট সাবমিট হয়েছে। কিছুক্ষণের মধ্যে চেক করে অ্যাডমিন ব্যালেন্স যোগ করে দেবে।");
+        }
+
+        // Task Submit Flow
+        function openTaskSubmit(name, link) {
+            selectedTaskForSubmit = name;
+            document.getElementById('submitTaskName').innerText = "কাজ: " + name;
+            document.getElementById('submitTaskLink').href = link;
+            document.getElementById('submitTaskBox').style.display = 'block';
+            window.scrollTo(0, document.body.scrollHeight);
+        }
+
+        function submitTaskToAdmin() {
+            const proof = document.getElementById('proofInput').value;
+            if(!proof) {
+                alertOrTelegram("ভোটের প্রমাণ হিসেবে স্ক্রিনশট বা প্রুফ লিংক দিন।");
+                return;
+            }
+            alertOrTelegram("আপনার প্রুফ জমা নেওয়া হয়েছে। অ্যাডমিন ভেরিফাই করলেই আপনার অ্যাকাউন্টে ১ টাকা যোগ হবে।");
+            document.getElementById('submitTaskBox').style.display = 'none';
+            document.getElementById('proofInput').value = "";
+        }
+
+        // Admin Security Check
+        function verifyAdmin() {
+            const pass = document.getElementById('adminPassInput').value;
+            if(pass === "143") {
+                document.getElementById('adminAuthBox').style.display = 'none';
+                document.getElementById('adminControlDashboard').style.display = 'block';
+                alertOrTelegram("অ্যাডমিন প্যানেল সফলভাবে আনলক হয়েছে!");
+            } else {
+                alertOrTelegram("ভুল পাসওয়ার্ড! আবার চেষ্টা করুন।");
+            }
+        }
+
+        // Helper function for dual support (Telegram Alert / Standard Alert)
+        function alertOrTelegram(msg) {
+            if(tg.showAlert) {
+                tg.showAlert(msg);
+            } else {
+                alert(msg);
+            }
+        }
+    </script>
 </body>
-</html>
+    </html>
