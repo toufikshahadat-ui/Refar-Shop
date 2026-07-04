@@ -1,0 +1,53 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Public read for specific collections
+    match /tasks/{document=**} {
+      allow read: if request.auth.uid != null;
+      allow write: if false;
+    }
+
+    // User data - only own documents
+    match /users/{userId} {
+      allow read: if request.auth.uid == userId || request.auth.uid != null;
+      allow create: if request.auth.uid == userId;
+      allow update: if request.auth.uid == userId;
+      allow delete: if false;
+    }
+
+    // Task submissions - only own documents
+    match /task_submissions/{document=**} {
+      allow read: if request.auth.uid != null;
+      allow create: if request.auth.uid != null;
+      allow update: if false;
+      allow delete: if false;
+    }
+
+    // Deposits - only own documents
+    match /deposits/{document=**} {
+      allow read: if request.auth.uid != null;
+      allow create: if request.auth.uid != null;
+      allow update: if false;
+      allow delete: if false;
+    }
+
+    // Withdrawals - only own documents
+    match /withdrawals/{document=**} {
+      allow read: if request.auth.uid != null;
+      allow create: if request.auth.uid != null;
+      allow update: if false;
+      allow delete: if false;
+    }
+
+    // History - only own documents
+    match /history/{document=**} {
+      allow read: if request.auth.uid != null;
+      allow write: if false;
+    }
+
+    // Default deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

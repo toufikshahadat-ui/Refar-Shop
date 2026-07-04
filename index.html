@@ -1,837 +1,223 @@
 <!DOCTYPE html>
 <html lang="bn">
 <head>
-    <meta charset="UTF-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-    <title>Refar Shop App</title>
-
-    <!-- Telegram WebApp Script -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Refar Shop - Telegram Mini App">
+    <meta name="theme-color" content="#0088cc">
+    <title>Refar Shop</title>
+    <link rel="stylesheet" href="style.css">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <!-- FontAwesome for Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
-    
-    <style>
-        /* Premium White & Blue Theme with Large Text */
-        :root {
-            --primary-blue: #007bff;
-            --deep-blue: #0056b3;
-            --light-blue-bg: #eef5fc;
-            --white: #ffffff;
-            --text-dark: #1e293b;
-            --text-muted: #64748b;
-            --success-green: #28a745;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        body {
-            background-color: var(--light-blue-bg);
-            color: var(--text-dark);
-            padding-bottom: 95px;
-            overflow-x: hidden;
-            font-size: 18px; /* Big Professional Font */
-        }
-
-        /* 1. Loader Screen Animation */
-        #loading-screen {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: var(--white);
-            z-index: 9999;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            transition: opacity 0.6s ease-out;
-        }
-
-        .loader-logo {
-            width: 150px;
-            height: 150px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 5px solid var(--primary-blue);
-            box-shadow: 0 0 25px rgba(0, 123, 255, 0.4);
-            animation: pulseGlow 2s infinite alternate;
-        }
-
-        @keyframes pulseGlow {
-            0% { transform: scale(1); box-shadow: 0 0 20px rgba(0, 123, 255, 0.3); }
-            100% { transform: scale(1.05); box-shadow: 0 0 40px rgba(40, 167, 69, 0.5); }
-        }
-
-        .loader-spinner {
-            margin-top: 25px;
-            width: 50px;
-            height: 50px;
-            border: 5px solid #e2e8f0;
-            border-left-color: var(--primary-blue);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin { 100% { transform: rotate(360deg); } }
-
-        .loader-text {
-            margin-top: 15px;
-            font-size: 20px;
-            font-weight: 700;
-            color: var(--primary-blue);
-            letter-spacing: 0.5px;
-        }
-
-        /* 2. Mandatory Channels Join Popup */
-        #join-popup {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(8px);
-            z-index: 9998;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            opacity: 0; pointer-events: none;
-            transition: 0.4s ease;
-        }
-
-        #join-popup.show { opacity: 1; pointer-events: auto; }
-
-        .popup-content {
-            background: var(--white);
-            border-radius: 24px;
-            padding: 35px 25px;
-            width: 100%;
-            max-width: 380px;
-            text-align: center;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
-            transform: translateY(30px);
-            transition: 0.4s ease;
-            border: 3px solid var(--primary-blue);
-        }
-
-        #join-popup.show .popup-content { transform: translateY(0); }
-
-        .popup-title {
-            font-size: 24px;
-            font-weight: 800;
-            color: var(--primary-blue);
-            margin-bottom: 12px;
-        }
-
-        .popup-text {
-            font-size: 16px;
-            color: var(--text-muted);
-            margin-bottom: 25px;
-            line-height: 1.6;
-        }
-
-        .popup-btn {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            width: 100%;
-            padding: 15px;
-            margin-bottom: 15px;
-            border-radius: 12px;
-            text-decoration: none;
-            font-weight: bold;
-            font-size: 18px;
-            color: white;
-            transition: 0.3s;
-        }
-
-        .btn-chan1 { background: linear-gradient(135deg, #229ED9, #0088cc); }
-        .btn-chan2 { background: linear-gradient(135deg, #0056b3, #007bff); }
-        
-        .popup-verify {
-            background: var(--success-green);
-            color: white;
-            border: none;
-            cursor: pointer;
-            width: 100%;
-            padding: 15px;
-            border-radius: 12px;
-            font-size: 18px;
-            font-weight: bold;
-            margin-top: 10px;
-            box-shadow: 0 4px 12px rgba(40,167,69,0.3);
-        }
-
-        /* Top Blue Gradient Header */
-        .header {
-            background: linear-gradient(135deg, var(--primary-blue), var(--deep-blue));
-            color: var(--white);
-            padding: 30px 20px;
-            text-align: center;
-            border-bottom-left-radius: 30px;
-            border-bottom-right-radius: 30px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-        }
-
-        .header h2 {
-            font-size: 28px;
-            font-weight: 800;
-        }
-
-        /* Big Gorgeous Profile Box */
-        .user-profile {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 12px;
-            margin-top: 20px;
-            background: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(10px);
-            padding: 20px;
-            border-radius: 20px;
-            border: 1px solid rgba(255,255,255,0.2);
-        }
-
-        .user-avatar {
-            width: 80px;
-            height: 80px;
-            background: var(--white);
-            color: var(--primary-blue);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 800;
-            font-size: 36px;
-            border: 4px solid rgba(255,255,255,0.6);
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-            overflow: hidden;
-        }
-
-        .user-avatar img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .user-info { text-align: center; }
-        .user-info .name { font-size: 22px; font-weight: 800; margin-bottom: 4px; }
-        .user-info .id { font-size: 14px; opacity: 0.9; font-weight: 600; }
-
-        .user-balance {
-            background: var(--white);
-            color: var(--deep-blue);
-            padding: 8px 24px;
-            border-radius: 50px;
-            font-weight: 900;
-            font-size: 22px;
-            margin-top: 5px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        /* Container & Elegant Cards */
-        .container { padding: 25px 15px; }
-        
-        .page { display: none; animation: slideUp 0.4s ease-in-out; }
-        .page.active { display: block; }
-
-        @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
-
-        .card {
-            background: var(--white);
-            border-radius: 20px;
-            padding: 22px;
-            margin-bottom: 22px;
-            box-shadow: 0 6px 18px rgba(0,123,255,0.06);
-            border: 1px solid rgba(0,123,255,0.05);
-        }
-
-        .card-title {
-            font-size: 20px;
-            font-weight: 700;
-            color: var(--deep-blue);
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        /* Form Controls */
-        .form-group { margin-bottom: 20px; }
-        .form-group label {
-            display: block;
-            font-size: 15px;
-            color: var(--text-dark);
-            margin-bottom: 8px;
-            font-weight: 600;
-        }
-
-        .form-control {
-            width: 100%;
-            padding: 15px;
-            border: 2px solid #cbd5e1;
-            border-radius: 12px;
-            outline: none;
-            font-size: 16px;
-            background-color: #f8fafc;
-            color: var(--text-dark);
-            transition: 0.3s;
-            font-weight: 500;
-        }
-
-        .form-control:focus {
-            border-color: var(--primary-blue);
-            background-color: var(--white);
-            box-shadow: 0 0 12px rgba(0, 123, 255, 0.15);
-        }
-
-        /* Buttons Core */
-        .btn {
-            display: block;
-            width: 100%;
-            padding: 15px;
-            background: linear-gradient(135deg, var(--primary-blue), var(--deep-blue));
-            color: var(--white);
-            border: none;
-            border-radius: 12px;
-            font-size: 18px;
-            font-weight: 700;
-            text-align: center;
-            cursor: pointer;
-            transition: 0.2s;
-            box-shadow: 0 4px 12px rgba(0,123,255,0.2);
-        }
-
-        .btn:active { transform: scale(0.97); }
-        .btn-success { background: linear-gradient(135deg, #28a745, #218838); box-shadow: 0 4px 12px rgba(40,167,69,0.2); }
-        
-        .btn-copy {
-            background: var(--light-blue-bg);
-            color: var(--deep-blue);
-            padding: 12px 20px;
-            font-size: 15px;
-            border-radius: 10px;
-            border: 2px dashed var(--primary-blue);
-            cursor: pointer;
-            font-weight: 700;
-            margin-top: 12px;
-        }
-
-        /* Premium Task Feed Grid */
-        .task-item {
-            background: var(--white);
-            border-left: 6px solid var(--primary-blue);
-            padding: 18px;
-            border-radius: 14px;
-            margin-bottom: 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
-        }
-
-        .task-details h4 { font-size: 18px; font-weight: 700; margin-bottom: 4px; color: var(--text-dark); }
-        .task-details p { font-size: 14px; color: var(--text-muted); font-weight: 500; }
-
-        .task-action .btn-sm {
-            padding: 10px 16px;
-            font-size: 15px;
-            font-weight: 700;
-            border-radius: 8px;
-            background: var(--primary-blue);
-            color: white;
-            border: none;
-            cursor: pointer;
-        }
-
-        /* Elite Dynamic Developer Box Container */
-        .developer-box {
-            background: linear-gradient(135deg, #ffffff, #eef5fc);
-            border: 2px solid #bce0fd;
-            border-radius: 16px;
-            padding: 20px;
-            margin-top: 25px;
-            text-align: center;
-            box-shadow: 0 6px 15px rgba(0,123,255,0.08);
-            text-decoration: none;
-            display: block;
-            color: inherit;
-            transition: 0.3s;
-        }
-        
-        .developer-box:active { transform: scale(0.97); }
-        .dev-title { font-size: 14px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-bottom: 6px; font-weight: bold; }
-        .dev-name { font-size: 19px; font-weight: 800; color: var(--text-dark); margin-bottom: 4px; }
-        .dev-text { font-size: 14px; color: var(--deep-blue); background: #ffffff; padding: 8px 14px; border-radius: 30px; display: inline-block; border: 2px dashed var(--primary-blue); font-weight: 700; margin-top: 5px; }
-
-        /* Power Admin Panel Infrastructure */
-        .admin-badge { background: #dc3545; color: white; padding: 4px 10px; border-radius: 8px; font-size: 13px; margin-left: 8px; font-weight: bold; }
-        .admin-section-title { font-size: 18px; font-weight: 700; color: #dc3545; margin: 25px 0 12px 0; border-bottom: 2px solid #f1f5f9; padding-bottom: 6px; }
-        
-        .user-table { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 15px; background: var(--white); }
-        .user-table th, .user-table td { border: 1px solid #e2e8f0; padding: 12px; text-align: left; font-weight: 600; }
-        .user-table th { background: #f1f5f9; color: var(--deep-blue); }
-
-        /* Navigation Systems */
-        .navbar {
-            position: fixed; bottom: 0; left: 0; right: 0; height: 72px;
-            background-color: var(--white);
-            border-top: 1px solid #e2e8f0;
-            display: flex; justify-content: space-around; align-items: center;
-            z-index: 1000;
-            box-shadow: 0 -4px 20px rgba(0,0,0,0.05);
-        }
-
-        .nav-item {
-            display: flex; flex-direction: column; align-items: center;
-            color: var(--text-muted); font-size: 14px; text-decoration: none; cursor: pointer; transition: 0.2s; font-weight: 600;
-        }
-
-        .nav-item i { font-size: 24px; margin-bottom: 4px; }
-        .nav-item.active { color: var(--primary-blue); font-weight: 800; }
-    </style>
 </head>
 <body>
-
-    <!-- 1. Custom Glow Loading Screen -->
-    <div id="loading-screen">
-        <img src="https://i.postimg.cc/gkm3ZNVT/IMG-20260702-235054-440.jpg" alt="Refar Shop Logo" class="loader-logo"/>
-        <div class="loader-spinner"></div>
-        <div class="loader-text">✨ REFAR SHOP LOADING... ✨</div>
+    <div id="loadingScreen" class="loading-container">
+        <div class="loading-content">
+            <img src="https://i.postimg.cc/gkm3ZNVT/IMG-20260702-235054-440.jpg" alt="Logo" class="loading-logo">
+            <div class="loading-spinner"></div>
+            <p class="loading-text">লোড হচ্ছে...</p>
+        </div>
     </div>
 
-    <!-- 2. Dual Channel Mandatory Join Popup -->
-    <div id="join-popup">
+    <div id="joinPopup" class="popup-overlay hidden">
         <div class="popup-content">
-            <div class="popup-title">📢 চ্যানেল জয়েন করুন!</div>
-            <div class="popup-text">বটটি ব্যবহার করতে আপনাকে অবশ্যই আমাদের অফিসিয়াল এবং স্পন্সর চ্যানেলে জয়েন করতে হবে। জয়েন না করলে টাস্ক করতে পারবেন না। ❌</div>
-            
-            <a href="https://t.me/Refar_Shop_ofc" target="_blank" class="popup-btn btn-chan1"><i class="fa-brands fa-telegram"></i> 🔵 Official Channel</a>
-            <a href="https://t.me/Toufiksworld" target="_blank" class="popup-btn btn-chan2"><i class="fa-brands fa-telegram"></i> 🟣 Sponsor Channel</a>
-            
-            <button class="popup-verify" onclick="verifyChannelJoin()">✅ আমি জয়েন করেছি (Verify)</button>
+            <h2 class="popup-title">চ্যানেলে যোগ দিন</h2>
+            <p class="popup-subtitle">অ্যাপ ব্যবহারের জন্য দুটি চ্যানেলে যোগ দিতে হবে</p>
+            <div class="join-channels">
+                <a href="https://t.me/Refar_Shop_ofc" target="_blank" class="join-btn">
+                    <span class="channel-icon">📢</span>
+                    <div class="channel-info">
+                        <div class="channel-name">অফিশিয়াল চ্যানেল</div>
+                        <div class="channel-handle">@Refar_Shop_ofc</div>
+                    </div>
+                </a>
+                <a href="https://t.me/Toufiksworld" target="_blank" class="join-btn">
+                    <span class="channel-icon">🤝</span>
+                    <div class="channel-info">
+                        <div class="channel-name">স্পন্সর চ্যানেল</div>
+                        <div class="channel-handle">@Toufiksworld</div>
+                    </div>
+                </a>
+            </div>
+            <button id="verifyJoinBtn" class="verify-btn">যাচাই করুন</button>
+            <p class="popup-note">উভয় চ্যানেলে যোগ দিয়ে যাচাই করুন</p>
         </div>
     </div>
 
-    <!-- Top Blue Gradient Header -->
-    <div class="header">
-        <h2>🚀 Refar Shop <span id="adminBadge" class="admin-badge" style="display:none;">Admin</span></h2>
-        
-        <!-- Big Profile Box -->
-        <div class="user-profile">
-            <div class="user-avatar" id="userAvatar">👤</div>
-            <div class="user-info">
-                <div id="userName" class="name">ইউজার লোড হচ্ছে...</div>
-                <div id="userId" class="id">🆔 ID: 0000000000</div>
+    <div id="appContainer" class="hidden">
+        <nav class="navbar">
+            <div class="navbar-brand">
+                <img src="https://i.postimg.cc/gkm3ZNVT/IMG-20260702-235054-440.jpg" alt="Logo" class="navbar-logo">
+                <span class="navbar-title">Refar Shop</span>
             </div>
-            <div class="user-balance">💰 ৳ <span id="userBalance">0.00</span></div>
-        </div>
-    </div>
+            <button id="notificationBtn" class="notification-btn">🔔</button>
+        </nav>
 
-    <!-- Main Screens Container -->
-    <div class="container">
-        
-        <!-- PAGE 1: HOME -->
-        <div id="page-home" class="page active">
-            <div class="card">
-                <div class="card-title">📢 নোটিশ বোর্ড</div>
-                <p style="line-height: 1.6; font-weight: 500;">আমাদের প্রিমিয়াম মিনি-অ্যাপে আপনাকে স্বাগত! এখানে আপনি খুব সহজে ভোট দিয়ে এবং বিভিন্ন ছোট মাইক্রো-টাস্ক কমপ্লিট করে ফ্রিতে ইনকাম করতে পারবেন। 💎</p>
-            </div>
-            
-            <div class="card">
-                <div class="card-title">🔗 রেফারেল ইনকাম লিংক</div>
-                <p style="margin-bottom: 12px; font-weight: 600;">প্রতিটি সফল ভেরিফাইড রেফারে পাবেন সরাসরি ২ টাকা ইনস্ট্যান্ট বোনাস! 🎁</p>
-                <input type="text" id="referLinkBox" class="form-control" value="https://t.me/Refar_Shop_bot?start=0000" readonly="readonly"/>
-                <button class="btn-copy" onclick="copyReferLink()"><i class="fa-regular fa-copy"></i> লিংক কপি করুন</button>
-            </div>
-
-            <!-- Professional Hideable Custom Developer Link Box -->
-            <a href="https://t.me/ST_Admin_Toufik?text=Hi,%F0%9F%91%8B%F0%9F%8F%BB%20%E1%94%B5%Template_ARIXO_%E3%83%A1_T%E1%B4%8fUX%C9%AA%E1%B4%8B%20%E0%A6%86%E0%A6%AE%E0%A6%BF%20%E0%A6%86%E0%A6%AA%E0%A6%A8%E0%A6%BE%E0%A6%B0%20%E0%A6%A5%E0%A1%87%E0%A6%95%E0%A7%87%20Telegram%20Bot%20%E0%A6%AC%E0%A6%A8%E0%A6%BE%E0%A6%AF%E0%A6%BC%E0%A7%87%20%E0%A6%A8%E0%A6%BF%E0%A6%A4%E0%A7%87%20%E0%A6%9A%E0%A6%BE%E0%A6%8Thread." target="_blank" class="developer-box">
-                <div class="dev-title">🛠️ Developer info</div>
-                <div class="dev-name">𝙰𝚁𝙸𝚇𝙾 メ Tᴏᴜғɪᴋ</div>
-                <div class="dev-text">🤖 আজই আপনার ইচ্ছামত bot বানিয়ে নিন!</div>
-            </a>
+        <div class="tab-navigation">
+            <button class="tab-btn active" data-tab="home">
+                <span class="tab-icon">🏠</span>
+                <span class="tab-label">হোম</span>
+            </button>
+            <button class="tab-btn" data-tab="tasks">
+                <span class="tab-icon">✓</span>
+                <span class="tab-label">টাস্ক</span>
+            </button>
+            <button class="tab-btn" data-tab="wallet">
+                <span class="tab-icon">💰</span>
+                <span class="tab-label">ওয়ালেট</span>
+            </button>
+            <button class="tab-btn" data-tab="history">
+                <span class="tab-icon">📋</span>
+                <span class="tab-label">ইতিহাস</span>
+            </button>
         </div>
 
-        <!-- PAGE 2: EARN / TASKS LIST -->
-        <div id="page-earn" class="page">
-            <div class="card-title">🔥 লাইভ টাস্ক বোর্ড</div>
-            <div id="tasksContainer">
-                <!-- Static Fallback Task -->
-                <div class="task-item">
-                    <div class="task-details">
-                        <h4>👍 ফটো কনটেস্ট ভোট</h4>
-                        <p>টাস্ক লিমিট: ২০/৫০</p>
-                    </div>
-                    <div class="task-action">
-                        <button class="btn-sm" onclick="openTaskSubmit('ফটো কনটেস্ট ভোট', 'https://t.me/Refar_Shop_ofc')">৳ ১.০০</button>
-                    </div>
-                </div>
-            </div>
-            
-            <div id="submitTaskBox" class="card" style="display:none; margin-top: 25px; border: 3px solid var(--success-green);">
-                <div class="card-title" style="color: var(--success-green);"><i class="fa-solid fa-cloud-arrow-up"></i> প্রমাণ পত্র সাবমিট করুন</div>
-                <p id="submitTaskName" style="font-weight: bold; margin-bottom: 5px;"></p>
-                <a id="submitTaskLink" href="#" target="_blank" style="color: var(--primary-blue); display:block; margin-bottom: 15px; font-weight: bold;">👉 এখানে ক্লিক করে কাজ সম্পন্ন করুন</a>
-                <div class="form-group">
-                    <label>💬 আপনার টেলিগ্রাম ইউজারনেম (@Username) অথবা সাবমিট কোড দিন:</label>
-                    <input type="text" id="proofInput" class="form-control" placeholder="যেমন: @Toufik_admin"/>
-                </div>
-                <button class="btn btn-success" onclick="submitTaskToAdmin()">টাস্ক সাবমিট করুন ✅</button>
-            </div>
-        </div>
-
-        <!-- PAGE 3: POST TASK -->
-        <div id="page-post" class="page">
-            <div class="card">
-                <div class="card-title">➕ নতুন ক্যাম্পেইন পোস্ট করুন</div>
-                <div class="form-group">
-                    <label>📊 টাস্ক এর ক্যাটাগরি</label>
-                    <select id="taskType" class="form-control" onchange="calculateCost()">
-                        <option value="vote">টেলিক্রাম ভোট (১ ভোট = ২ টাকা খরচ)</option>
-                        <option value="refer">বট রেফারেল (১ রেফার = ২ টাকা খরচ)</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>✍️ শিরোনাম/কাজের বিবরণ</label>
-                    <input type="text" id="postTaskName" class="form-control" placeholder="যেমন: গ্রুপে ৩ নাম্বারে ভোট দিন"/>
-                </div>
-                <div class="form-group">
-                    <label>🔗 কাজের লিংক</label>
-                    <input type="text" id="postTaskLink" class="form-control" placeholder="https://t.me/..."/>
-                </div>
-                <div class="form-group">
-                    <label>🔢 সংখ্যা/পরিমাণ (মিনিমাম ২০)</label>
-                    <input type="number" id="taskQuantity" class="form-control" min="20" value="20" oninput="calculateCost()"/>
-                </div>
-                
-                <p style="background: var(--light-blue-bg); padding: 15px; border-radius: 12px; margin-bottom: 18px; font-weight: 700;">
-                    💳 মোট বিলিং খরচ: <span style="color: var(--primary-blue);">৳ <span id="totalCost">40</span></span>
-                </p>
-                
-                <button class="btn" onclick="publishTask()">🚀 টাস্ক রিকোয়েস্ট পাঠান</button>
-            </div>
-        </div>
-
-        <!-- PAGE 4: WALLET / DEPOSIT -->
-        <div id="page-wallet" class="page">
-            <div class="card">
-                <div class="card-title">💳 ম্যানুয়াল ডিপোজিট প্যানেল</div>
-                <div class="form-group">
-                    <label>📱 আমাদের পার্সোনাল নগদ নাম্বার</label>
-                    <div style="display: flex; gap: 10px;">
-                        <input type="text" id="nagadNumber" class="form-control" value="01707336070" readonly="readonly" style="font-weight: bold; letter-spacing: 1px; color: #ff9800;"/>
-                        <button class="btn" onclick="copyNagadNumber()" style="width: auto; padding: 0 18px;"><i class="fa-regular fa-copy"></i></button>
-                    </div>
-                    <p style="font-size: 14px; color: var(--text-muted); margin-top: 8px; font-weight: 500;">⚠️ টাকা পাঠিয়ে নিচের ফর্মটি পূরণ করুন। সর্বনিম্ন ডিপোজিট ৫০ টাকা।</p>
-                </div>
-                
-                <div class="form-group">
-                    <label>💵 টাকার পরিমাণ</label>
-                    <input type="number" id="depAmount" class="form-control" placeholder="50"/>
-                </div>
-                <div class="form-group">
-                    <label>🆔 ট্রানজেকশন আইডি (TxID)</label>
-                    <input type="text" id="depTxid" class="form-control" placeholder="NGD738X92B"/>
-                </div>
-                <button class="btn btn-success" onclick="submitDeposit()">💰 ডিপোজিট সাবমিট করুন</button>
-            </div>
-        </div>
-
-        <!-- PAGE 5: ADVANCED LIVE ADMIN PANEL -->
-        <div id="page-admin" class="page">
-            <div class="card" style="border: 3px solid #dc3545;">
-                <div class="card-title" style="color: #dc3545;">🔐 প্রফেশনাল অ্যাডমিন ড্যাশবোর্ড</div>
-                
-                <div id="adminAuthBox">
-                    <div class="form-group">
-                        <label>🔑 অ্যাডমিন সিকিউরিটি পিন দিন</label>
-                        <input type="password" id="adminPassInput" class="form-control" placeholder="••••"/>
-                    </div>
-                    <button class="btn" style="background: #dc3545; color: white;" onclick="verifyAdmin()">⚙️ ড্যাশবোর্ড আনলক করুন</button>
-                </div>
-                
-                <!-- Super Admin Active Management Controls -->
-                <div id="adminControlDashboard" style="display: none;">
-                    
-                    <div class="admin-section-title">➕ সরাসরি লাইভ টাস্ক অ্যাড করুন</div>
-                    <div class="form-group">
-                        <label>📝 টাস্কের নাম</label>
-                        <input type="text" id="admTaskName" class="form-control" placeholder="যেমন: নতুন গ্রুপে জয়েন"/>
-                    </div>
-                    <div class="form-group">
-                        <label>🔗 টাস্কের লিংক</label>
-                        <input type="text" id="admTaskLink" class="form-control" placeholder="https://t.me/..."/>
-                    </div>
-                    <button class="btn" style="background: var(--primary-blue);" onclick="adminAddLiveTask()">✨ টাস্ক সরাসরি লাইভ করুন</button>
-
-                    <div class="admin-section-title">👥 লাইভ একটিভ ইউজার লিস্ট (<span id="userCount">0</span>)</div>
-                    <div style="overflow-x: auto;">
-                        <table class="user-table">
-                            <thead>
-                                <tr>
-                                    <th>👤 ইউজার নাম</th>
-                                    <th>🆔 টেলিগ্রাম আইডি</th>
-                                    <th>💰 ব্যালেন্স</th>
-                                </tr>
-                            </thead>
-                            <tbody id="adminUserTableBody">
-                                <!-- Genuine live users only will render here -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-    </div>
-
-    <!-- Navigation Bar Elements -->
-    <div class="navbar">
-        <div class="nav-item active" onclick="switchPage('home', this)"><i class="fa-solid fa-house"></i>হোম</div>
-        <div class="nav-item" onclick="switchPage('earn', this)"><i class="fa-solid fa-bolt"></i>টাস্ক করুন</div>
-        <div class="nav-item" onclick="switchPage('post', this)"><i class="fa-solid fa-circle-plus"></i>পোস্ট করুন</div>
-        <div class="nav-item" onclick="switchPage('wallet', this)"><i class="fa-solid fa-wallet"></i>ওয়ালেট</div>
-        <div class="nav-item" id="navAdminBtn" onclick="switchPage('admin', this)"><i class="fa-solid fa-user-shield"></i>অ্যাডমিন</div>
-    </div>
-
-    <script type="text/javascript">
-        // Telegram Main Script Injection
-        const tg = window.Telegram.WebApp;
-        tg.expand(); 
-
-        let currentUserId = 123456789; // Default Fallback
-        let currentUserName = "টেলিক্রাম ইউজার";
-        let defaultBalance = 0.00;
-
-        // Reset or create real-time Users Database in LocalStorage
-        if(!localStorage.getItem('realUsersDB')) {
-            localStorage.setItem('realUsersDB', JSON.stringify([]));
-        }
-
-        // Loader Screen Animation Handler
-        window.addEventListener('DOMContentLoaded', () => {
-            setTimeout(() => {
-                const loader = document.getElementById('loading-screen');
-                loader.style.opacity = '0';
-                setTimeout(() => {
-                    loader.style.display = 'none';
-                    checkPopupRequirement();
-                }, 600);
-            }, 2500); 
-        });
-
-        function checkPopupRequirement() {
-            if(!localStorage.getItem('hasJoinedChannels')) {
-                document.getElementById('join-popup').classList.add('show');
-            }
-        }
-
-        function verifyChannelJoin() {
-            localStorage.setItem('hasJoinedChannels', 'true');
-            document.getElementById('join-popup').classList.remove('show');
-            alertOrTelegram("ধন্যবাদ! আপনার মেম্বারশিপ ভেরিফাই করা হয়েছে। 🎉");
-        }
-
-        // Live Real-Time User Processing Setup
-        if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
-            currentUserId = tg.initDataUnsafe.user.id;
-            currentUserName = tg.initDataUnsafe.user.first_name + " " + (tg.initDataUnsafe.user.last_name || "");
-            
-            // Render profile image dynamically if available via official client source
-            if(tg.initDataUnsafe.user.photo_url) {
-                document.getElementById('userAvatar').innerHTML = `<img src="${tg.initDataUnsafe.user.photo_url}" alt="Profile"/>`;
-            }
-        }
-
-        // Live database sync logic (adds only real logged in users)
-        let db = JSON.parse(localStorage.getItem('realUsersDB'));
-        let userExists = db.find(u => u.id === currentUserId);
-        
-        if(!userExists) {
-            userExists = { name: currentUserName, id: currentUserId, balance: 10.00 }; // Welcome bonus 10tk given automatically
-            db.push(userExists);
-            localStorage.setItem('realUsersDB', JSON.stringify(db));
-        }
-        defaultBalance = userExists.balance;
-
-        // Dom updates
-        document.getElementById('userName').innerText = "👋 " + currentUserName;
-        document.getElementById('userId').innerText = "🆔 ID: " + currentUserId;
-        if(!tg.initDataUnsafe.user?.photo_url) {
-            document.getElementById('userAvatar').innerText = currentUserName.charAt(0).toUpperCase();
-        }
-        document.getElementById('userBalance').innerText = defaultBalance.toFixed(2);
-        document.getElementById('referLinkBox').value = "https://t.me/Refar_Shop_bot?start=" + currentUserId;
-
-        // Real Admin Verification Check (Set your Master ID here)
-        if(currentUserId === 8380674482 || currentUserId === 123456789) {
-            document.getElementById('adminBadge').style.display = 'inline-block';
-        }
-
-        // Router Engine Switching System
-        function switchPage(pageId, element) {
-            const pages = document.querySelectorAll('.page');
-            pages.forEach(page => page.classList.remove('active'));
-            
-            document.getElementById('page-' + pageId).classList.add('active');
-
-            const navItems = document.querySelectorAll('.nav-item');
-            navItems.forEach(item => item.classList.remove('active'));
-            element.classList.add('active');
-
-            if(pageId === 'admin') {
-                renderAdminUsers();
-            }
-        }
-
-        function copyNagadNumber() {
-            const numField = document.getElementById('nagadNumber');
-            numField.select();
-            navigator.clipboard.writeText(numField.value);
-            alertOrTelegram("নগদ নম্বরটি কপি করা হয়েছে! 📋");
-        }
-
-        function copyReferLink() {
-            const refField = document.getElementById('referLinkBox');
-            refField.select();
-            navigator.clipboard.writeText(refField.value);
-            alertOrTelegram("আপনার পার্সোনাল রেফারেল লিংক কপি হয়েছে! 🚀");
-        }
-
-        function calculateCost() {
-            const qty = document.getElementById('taskQuantity').value;
-            document.getElementById('totalCost').innerText = qty * 2;
-        }
-
-        // Dynamic Tasks Handler Logic
-        if(!localStorage.getItem('customTasks')) {
-            localStorage.setItem('customTasks', JSON.stringify([]));
-        }
-
-        function renderLiveTasks() {
-            const container = document.getElementById('tasksContainer');
-            let customTasks = JSON.parse(localStorage.getItem('customTasks'));
-            
-            let htmlContent = `
-                <div class="task-item">
-                    <div class="task-details">
-                        <h4>👍 ফটো কনটেস্ট ভোট</h4>
-                        <p>টাস্ক লিমিট: ২০/৫০</p>
-                    </div>
-                    <div class="task-action">
-                        <button class="btn-sm" onclick="openTaskSubmit('ফটো কনটেস্ট ভোট', 'https://t.me/Refar_Shop_ofc')">৳ ১.০০</button>
-                    </div>
-                </div>
-            `;
-
-            customTasks.forEach((task) => {
-                htmlContent += `
-                    <div class="task-item">
-                        <div class="task-details">
-                            <h4>✨ ${task.name}</h4>
-                            <p>লিমিট: ০/১০০ (লাইভ টাস্ক)</p>
-                        </div>
-                        <div class="task-action">
-                            <button class="btn-sm" onclick="openTaskSubmit('${task.name}', '${task.link}')">৳ ১.৫০</button>
+        <div class="content-container">
+            <section id="homeSection" class="content-section active">
+                <div class="profile-card">
+                    <div class="profile-header">
+                        <img id="profilePhoto" src="" alt="Profile" class="profile-photo">
+                        <div class="profile-info">
+                            <h2 id="userName" class="profile-name">-</h2>
+                            <p id="userTgId" class="profile-tg-id">ID: -</p>
                         </div>
                     </div>
-                `;
-            });
-            container.innerHTML = htmlContent;
-        }
+                    <div class="profile-stats">
+                        <div class="stat-item">
+                            <span class="stat-label">ব্যালেন্স</span>
+                            <span id="balanceDisplay" class="stat-value">৳ 0.00</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">রেফারেল</span>
+                            <span id="referralCount" class="stat-value">0</span>
+                        </div>
+                    </div>
+                </div>
 
-        renderLiveTasks();
+                <div class="notice-board">
+                    <h3 class="section-title">📢 নোটিস বোর্ড</h3>
+                    <div id="noticeContent" class="notice-content">
+                        <p class="notice-text">স্বাগতম Refar Shop এ। এখানে আপনি টাস্ক সম্পূর্ণ করে টাকা অর্জন করতে পারবেন।</p>
+                    </div>
+                </div>
 
-        function adminAddLiveTask() {
-            const name = document.getElementById('admTaskName').value;
-            const link = document.getElementById('admTaskLink').value;
+                <div class="referral-section">
+                    <h3 class="section-title">🔗 রেফারেল লিঙ্ক</h3>
+                    <div class="referral-box">
+                        <input type="text" id="referralLink" class="referral-input" readonly>
+                        <button id="copyReferralBtn" class="copy-btn">কপি</button>
+                    </div>
+                    <p class="referral-reward">প্রতিটি সফল রেফারেল: ৳ 2.00</p>
+                </div>
 
-            if(!name || !link) {
-                alertOrTelegram("দয়া করে টাস্কের নাম এবং লিংক দুটিই প্রদান করুন। ❌");
-                return;
-            }
+                <div class="developer-card">
+                    <div class="developer-content">
+                        <p class="developer-label">ডেভেলপার</p>
+                        <p class="developer-name">𝙰𝚁𝙸𝚇𝙾 メ Tᴏᴜғɪᴋ</p>
+                    </div>
+                    <a href="https://t.me/ST_Admin_Toufik" target="_blank" class="developer-link">যোগাযোগ করুন</a>
+                </div>
+            </section>
 
-            let tasks = JSON.parse(localStorage.getItem('customTasks'));
-            tasks.push({ name: name, link: link });
-            localStorage.setItem('customTasks', JSON.stringify(tasks));
-            
-            alertOrTelegram("নতুন টাস্ক সফলভাবে মিনি-অ্যাপে লাইভ করা হয়েছে! 🔥");
-            document.getElementById('admTaskName').value = "";
-            document.getElementById('admTaskLink').value = "";
-            renderLiveTasks();
-        }
+            <section id="tasksSection" class="content-section">
+                <div class="tasks-header">
+                    <h2 class="section-title">📋 লাইভ টাস্ক</h2>
+                    <p class="tasks-subtitle" id="taskCount">মোট টাস্ক: 0</p>
+                </div>
+                <div id="tasksContainer" class="tasks-container"></div>
+                <div id="noTasksMsg" class="empty-state hidden">
+                    <p class="empty-icon">📭</p>
+                    <p class="empty-text">কোনো টাস্ক নেই</p>
+                </div>
+            </section>
 
-        // Genuine Live Real Time Users Renderer Inside Admin Panel
-        function renderAdminUsers() {
-            const tbody = document.getElementById('adminUserTableBody');
-            let realDB = JSON.parse(localStorage.getItem('realUsersDB'));
-            
-            document.getElementById('userCount').innerText = realDB.length;
-            
-            if(realDB.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:var(--text-muted);">কোনো লাইভ ইউজার এখনও যুক্ত হয়নি ❌</td></tr>`;
-                return;
-            }
+            <section id="walletSection" class="content-section">
+                <div class="wallet-header">
+                    <div class="balance-display">
+                        <p class="balance-label">আপনার ব্যালেন্স</p>
+                        <p id="walletBalance" class="balance-amount">৳ 0.00</p>
+                    </div>
+                </div>
 
-            let rows = "";
-            realDB.forEach(u => {
-                rows += `<tr>
-                    <td>👤 ${u.name}</td>
-                    <td>${u.id}</td>
-                    <td style="color:var(--success-green); font-weight:bold;">৳ ${u.balance.toFixed(2)}</td>
-                </tr>`;
-            });
-            tbody.innerHTML = rows;
-        }
+                <div class="wallet-options">
+                    <button id="depositBtn" class="wallet-btn deposit-btn">
+                        <span class="option-icon">➕</span>
+                        <span class="option-text">ডিপোজিট</span>
+                    </button>
+                    <button id="withdrawBtn" class="wallet-btn withdraw-btn">
+                        <span class="option-icon">➖</span>
+                        <span class="option-text">উইথড্র</span>
+                    </button>
+                </div>
 
-        function publishTask() {
-            alertOrTelegram("টাস্ক সাবমিট হয়েছে! অ্যাডমিন ভেরিফিকেশনের পর লাইভ হবে। 🚀");
-        }
+                <div id="depositForm" class="form-container hidden">
+                    <h3 class="form-title">ডিপোজিট করুন</h3>
+                    <p class="form-note">পেমেন্ট মেথড: নগদ (Nagad)</p>
+                    <p class="payment-number">নগদ নম্বর: 01707336070</p>
+                    <div class="form-group">
+                        <label for="depositAmount">পরিমাণ (টাকা)</label>
+                        <input type="number" id="depositAmount" class="form-input" placeholder="যেমন: 500" min="50" step="10">
+                    </div>
+                    <div class="form-group">
+                        <label for="transactionId">ট্রানজেকশন আইডি</label>
+                        <input type="text" id="transactionId" class="form-input" placeholder="নগদ ট্রানজেকশন আইডি">
+                    </div>
+                    <div class="form-actions">
+                        <button id="submitDepositBtn" class="submit-btn">সাবমিট করুন</button>
+                        <button id="cancelDepositBtn" class="cancel-btn">বাতিল</button>
+                    </div>
+                </div>
 
-        function submitDeposit() {
-            alertOrTelegram("আপনার ম্যানুয়াল ডিপোজিট রিকোয়েস্ট পাঠানো হয়েছে! 💰");
-        }
+                <div id="withdrawForm" class="form-container hidden">
+                    <h3 class="form-title">উইথড্র করুন</h3>
+                    <p class="form-note">নির্ধারিত পরিমাণ: ৳ 50.00</p>
+                    <div class="form-group">
+                        <label for="withdrawMethod">পেমেন্ট মেথড</label>
+                        <select id="withdrawMethod" class="form-input">
+                            <option value="">নির্বাচন করুন</option>
+                            <option value="bkash">Bkash</option>
+                            <option value="nagad">Nagad</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="withdrawNumber">মোবাইল নম্বর</label>
+                        <input type="text" id="withdrawNumber" class="form-input" placeholder="০১xxx-xxxxxx">
+                    </div>
+                    <div class="withdraw-note">
+                        <p>⏰ প্রতি ২৪ ঘণ্টায় একবার উইথড্র করতে পারবেন</p>
+                    </div>
+                    <div class="form-actions">
+                        <button id="submitWithdrawBtn" class="submit-btn">উইথড্র করুন</button>
+                        <button id="cancelWithdrawBtn" class="cancel-btn">বাতিল</button>
+                    </div>
+                </div>
 
-        function openTaskSubmit(name, link) {
-            document.getElementById('submitTaskName').innerText = "🎯 কাজ: " + name;
-            document.getElementById('submitTaskLink').href = link;
-            document.getElementById('submitTaskBox').style.display = 'block';
-            window.scrollTo(0, document.body.scrollHeight);
-        }
+                <div id="pendingRequests" class="pending-section hidden">
+                    <h3 class="section-title">⏳ অপেক্ষাধীন অনুরোধ</h3>
+                    <div id="pendingRequestsContainer" class="requests-container"></div>
+                </div>
+            </section>
 
-        function submitTaskToAdmin() {
-            const proof = document.getElementById('proofInput').value;
-            if(!proof) {
-                alertOrTelegram("দয়া করে ইউজারনেম অথবা সাবমিট কোড দিন! ❌");
-                return;
-            }
-            alertOrTelegram("আপনার প্রমাণ জমা নেওয়া হয়েছে! সফলভাবে চেক করার পর ব্যালেন্স যোগ হবে। ✅");
-            document.getElementById('submitTaskBox').style.display = 'none';
-            document.getElementById('proofInput').value = "";
-        }
+            <section id="historySection" class="content-section">
+                <h2 class="section-title">📜 ইতিহাস</h2>
+                <div id="historyContainer" class="history-container"></div>
+                <div id="noHistoryMsg" class="empty-state hidden">
+                    <p class="empty-icon">📭</p>
+                    <p class="empty-text">কোনো ইতিহাস নেই</p>
+                </div>
+            </section>
+        </div>
+    </div>
 
-        // Admin Auth Code (PIN: 143)
-        function verifyAdmin() {
-            const pin = document.getElementById('adminPassInput').value;
-            if(pin === "143") {
-                document.getElementById('adminAuthBox').style.display = 'none';
-                document.getElementById('adminControlDashboard').style.display = 'block';
-                renderAdminUsers();
-            } else {
-                alertOrTelegram("ভুল পিন নাম্বার! সঠিক পিন দিন। ❌");
-            }
-        }
+    <div id="taskModal" class="modal hidden">
+        <div class="modal-content">
+            <button class="modal-close">&times;</button>
+            <div id="taskModalBody"></div>
+        </div>
+    </div>
 
-        function alertOrTelegram(msg) {
-            if(tg.showAlert) { tg.showAlert(msg); } else { alert(msg); }
-        }
-    </script>
+    <div id="toast" class="toast hidden"></div>
+
+    <script type="module" src="firebase.js"></script>
+    <script type="module" src="app.js"></script>
 </body>
-    </html>
+</html>
